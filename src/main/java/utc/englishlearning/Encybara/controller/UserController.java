@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import utc.englishlearning.Encybara.domain.User;
 import utc.englishlearning.Encybara.service.UserService;
 import utc.englishlearning.Encybara.util.error.IdInvalidException;
 
 @RestController
+@CrossOrigin(origins = "*")
 public class UserController {
     private final UserService userService;
 
