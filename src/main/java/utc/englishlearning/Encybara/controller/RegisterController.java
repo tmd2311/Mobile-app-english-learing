@@ -7,11 +7,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import utc.englishlearning.Encybara.domain.RestResponse;
 import utc.englishlearning.Encybara.domain.User;
+import utc.englishlearning.Encybara.domain.dto.ErrorResponseDTO;
 import utc.englishlearning.Encybara.domain.dto.RegisterDTO;
 import utc.englishlearning.Encybara.domain.dto.ResLoginDTO;
 import utc.englishlearning.Encybara.service.UserService;
 import org.springframework.http.HttpStatus;
+import utc.englishlearning.Encybara.util.error.IdInvalidException;
 
 @RestController
 public class RegisterController {
@@ -24,10 +27,11 @@ public class RegisterController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ResLoginDTO> register(@Valid @RequestBody RegisterDTO registerDto) {
+    public ResponseEntity<ErrorResponseDTO> register(@Valid @RequestBody RegisterDTO registerDto)  {
         // Kiểm tra xem email đã tồn tại chưa
         if (userService.existsByEmail(registerDto.getEmail())) {
-            return ResponseEntity.badRequest().body(null);
+            ErrorResponseDTO erro = new ErrorResponseDTO("Email already exists");
+            return ResponseEntity.badRequest().body(erro);
         }
 
         // Mã hóa mật khẩu người dùng
@@ -40,6 +44,7 @@ public class RegisterController {
 
         // Lưu người dùng vào cơ sở dữ liệu
         User savedUser = userService.handleCreateUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+        ErrorResponseDTO erro = new ErrorResponseDTO("Register successful");
+        return ResponseEntity.status(HttpStatus.CREATED).body(erro);
     }
 }
