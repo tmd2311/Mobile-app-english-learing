@@ -37,24 +37,11 @@ public class RegisterController {
     @PostMapping("/register")
     public ResponseEntity<ErrorResponseDTO> register(@Valid @RequestBody RegisterDTO registerDto)  {
         // Kiểm tra xem email đã tồn tại chưa
-        if (userService.existsByEmail(registerDto.getEmail())) {
-            return ResponseEntity.badRequest().body(new ErrorResponseDTO("Email already exists"));
-        }
-
-//        // Mã hóa mật khẩu người dùng
-//        String encodedPassword = passwordEncoder.encode(registerDto.getPassword());
-//
-//        // Tạo đối tượng User từ thông tin đăng ký
-//        User user = new User();
-//        user.setEmail(registerDto.getEmail()); // Đảm bảo có email
-//        user.setPassword(encodedPassword);
-//
-//        // Lưu người dùng vào cơ sở dữ liệu
-//        User savedUser = userService.handleCreateUser(user);
-//        ErrorResponseDTO erro = new ErrorResponseDTO("Register successful");
-//        return ResponseEntity.status(HttpStatus.CREATED).body(erro);
+//        if (userService.existsByEmail(registerDto.getEmail())) {
+//            return ResponseEntity.badRequest().body(new ErrorResponseDTO("Email already exists"));
+//        }
         String otp = otpService.generateOtp(registerDto.getEmail());
-        emailService.sendEmail(registerDto.getEmail(), "Your OTP Code", "Your OTP is: " + otp);
+        emailService.sendEmailFromTemplateSync(registerDto.getEmail(), "Your OTP Code",  otp);
         otpService.saveRegisterData(registerDto.getEmail(), registerDto);
 
         return ResponseEntity.ok(new ErrorResponseDTO("OTP sent to your email. Please verify to complete registration."));

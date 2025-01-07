@@ -12,6 +12,6 @@ public class EmailController {
     }
     @RequestMapping("/email")
     public String email() {
-        return "Hello World";
+        return "Send email successfully";
     }
 }
