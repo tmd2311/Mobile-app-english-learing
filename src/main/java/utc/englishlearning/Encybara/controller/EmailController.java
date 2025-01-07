@@ -12,7 +12,6 @@ public class EmailController {
     }
     @RequestMapping("/email")
     public String email() {
-        emailService.sendEmail();
         return "Hello World";
     }
 }

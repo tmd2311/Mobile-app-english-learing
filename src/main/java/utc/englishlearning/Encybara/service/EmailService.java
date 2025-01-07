@@ -10,12 +10,13 @@ public class EmailService {
     public EmailService(MailSender mailSender) {
         this.mailSender = mailSender;
     }
-    public void sendEmail(){
+    public void sendEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("englishlearning");
-        message.setTo("dung.kayc@gmail.com");
-        message.setSubject("Test from englishlearning");
-        message.setText("https://www.facebook.com/tmd.23.11/");
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(text);
         this.mailSender.send(message);
+        System.out.println("Sending email to " + to + " with body: " + text);
     }
 }
