@@ -13,7 +13,7 @@ public class EmailService {
     public void sendEmail(){
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("englishlearning");
-        message.setTo("truongluu1888@gmail.com");
+        message.setTo("dung.kayc@gmail.com");
         message.setSubject("Test from englishlearning");
         message.setText("https://www.facebook.com/tmd.23.11/");
         this.mailSender.send(message);
