@@ -11,7 +11,7 @@ public class Webconfig {
     @Bean
     public ViewResolver viewResolver() {
         InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-        resolver.setPrefix("/WEB-INF/view/");
+        resolver.setPrefix("/WEB-INF/view/signin/");
         resolver.setSuffix(".jsp");
         return resolver;
     }
