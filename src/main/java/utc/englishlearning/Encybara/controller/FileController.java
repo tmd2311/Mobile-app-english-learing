@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +25,10 @@ import utc.englishlearning.Encybara.domain.response.file.ResUploadFileDTO;
 import utc.englishlearning.Encybara.service.FileService;
 import utc.englishlearning.Encybara.util.annotation.ApiMessage;
 import utc.englishlearning.Encybara.util.error.StorageException;
+import utc.englishlearning.Encybara.domain.Question;
+import utc.englishlearning.Encybara.domain.Learning_Material;
+import utc.englishlearning.Encybara.repository.LearningMaterialRepository;
+import utc.englishlearning.Encybara.service.QuestionService;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -33,9 +38,14 @@ public class FileController {
     private String baseURI;
 
     private final FileService fileService;
+    private final QuestionService questionService;
+    private final LearningMaterialRepository learning_MaterialRepository;
 
-    public FileController(FileService fileService) {
+    public FileController(FileService fileService, QuestionService questionService,
+            LearningMaterialRepository learning_MaterialRepository) {
         this.fileService = fileService;
+        this.questionService = questionService;
+        this.learning_MaterialRepository = learning_MaterialRepository;
     }
 
     @PostMapping("/files")
@@ -91,5 +101,33 @@ public class FileController {
                 .contentLength(fileLength)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
+    }
+
+    @PostMapping("/files/listening")
+    @ApiMessage("Upload mp3 file for listening question")
+    public ResponseEntity<ResUploadFileDTO> uploadListeningFile(
+            @RequestParam(name = "file") MultipartFile file,
+            @RequestParam(name = "questionId") Long questionId)
+            throws URISyntaxException, IOException, StorageException {
+        // Kiểm tra file
+        if (file == null || file.isEmpty()) {
+            throw new StorageException("File is empty. Please upload a file.");
+        }
+
+        // Lưu file mp3
+        String fileName = fileService.store(file, "listening"); // Giả sử bạn có thư mục "listening"
+
+        // Cập nhật câu hỏi với link mp3
+        Question question = questionService.getQuestionById(questionId);
+        if (question != null) {
+            Learning_Material learningMaterial = new Learning_Material();
+            learningMaterial.setQuestion(question);
+            learningMaterial.setMaterLink(fileName);
+            learningMaterial.setMaterType("audio/mpeg");
+            learning_MaterialRepository.save(learningMaterial);
+        }
+
+        ResUploadFileDTO res = new ResUploadFileDTO(fileName, Instant.now());
+        return ResponseEntity.ok().body(res);
     }
 }

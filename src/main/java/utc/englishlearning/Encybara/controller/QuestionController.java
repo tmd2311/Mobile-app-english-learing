@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utc.englishlearning.Encybara.domain.Question;
 import utc.englishlearning.Encybara.service.QuestionService;
+import utc.englishlearning.Encybara.domain.response.question.ResCreateQuestionDTO;
+import utc.englishlearning.Encybara.domain.response.question.ResUpdateQuestionDTO;
 
 import java.util.List;
 
@@ -26,13 +28,18 @@ public class QuestionController {
     }
 
     @PostMapping
-    public ResponseEntity<Question> createQuestion(@RequestBody Question question) {
-        return ResponseEntity.ok(questionService.createQuestion(question));
+    public ResponseEntity<Question> createQuestion(
+            @RequestBody ResCreateQuestionDTO questionDTO) {
+        Question createdQuestion = questionService.createQuestion(questionDTO);
+        return ResponseEntity.ok(createdQuestion);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Question> updateQuestion(@PathVariable Long id, @RequestBody Question question) {
-        return ResponseEntity.ok(questionService.updateQuestion(id, question));
+    public ResponseEntity<ResUpdateQuestionDTO> updateQuestion(@PathVariable Long id,
+            @RequestBody ResUpdateQuestionDTO questionDTO) {
+        questionDTO.setId(id);
+        ResUpdateQuestionDTO updatedQuestionDTO = questionService.updateQuestion(id, questionDTO);
+        return ResponseEntity.ok(updatedQuestionDTO);
     }
 
     @DeleteMapping("/{id}")
