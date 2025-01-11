@@ -50,7 +50,7 @@ public class SecurityConfiguration {
                 "/v3/api-docs/**",
                 "/swagger-ui/**",
                 "/swagger-ui.html",
-                "/verify-otp"
+                "api/v1/auth/verify-otp"
         };
 
         http

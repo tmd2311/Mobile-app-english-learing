@@ -9,7 +9,7 @@ public class ResCreateUserDTO {
     private long id;
     private String name;
     private String email;
-
+    private String password;
     private String phone;
     private int field;
     private String avatar;
