@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -33,6 +34,9 @@ public class User {
     private String avatar;
     private String englishlevel;
 
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String refreshToken;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     List<Flashcard> flashcards;
@@ -40,7 +44,7 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Message> messages;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY        )
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Lesson_Result> lessonResults;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
@@ -52,6 +56,6 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Answer> answers;
 
-    @OneToOne(mappedBy = "user",fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private Learning_Result learningResult;
 }

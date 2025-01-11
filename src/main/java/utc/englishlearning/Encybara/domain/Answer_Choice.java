@@ -5,7 +5,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Column;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
@@ -24,5 +23,5 @@ public class Answer_Choice {
 
     @ManyToOne
     @JoinColumn(name = "answer_id", nullable = false)
-    private Answer answer; 
+    private Answer answer;
 }

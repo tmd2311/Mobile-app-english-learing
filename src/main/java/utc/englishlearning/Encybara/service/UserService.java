@@ -1,12 +1,19 @@
-
 package utc.englishlearning.Encybara.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import utc.englishlearning.Encybara.domain.User;
+import utc.englishlearning.Encybara.domain.response.ResCreateUserDTO;
+import utc.englishlearning.Encybara.domain.response.ResUpdateUserDTO;
+import utc.englishlearning.Encybara.domain.response.ResUserDTO;
+import utc.englishlearning.Encybara.domain.response.ResultPaginationDTO;
 import utc.englishlearning.Encybara.repository.UserRepository;
 
 @Service
@@ -19,6 +26,7 @@ public class UserService {
     }
 
     public User handleCreateUser(User user) {
+
         return this.userRepository.save(user);
     }
 
@@ -34,16 +42,35 @@ public class UserService {
         return null;
     }
 
-    public List<User> fetchAllUser() {
-        return this.userRepository.findAll();
+    public ResultPaginationDTO fetchAllUser(Specification<User> spec, Pageable pageable) {
+        Page<User> pageUser = this.userRepository.findAll(spec, pageable);
+        ResultPaginationDTO rs = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
+
+        mt.setPage(pageable.getPageNumber() + 1);
+        mt.setPageSize(pageable.getPageSize());
+
+        mt.setPages(pageUser.getTotalPages());
+        mt.setTotal(pageUser.getTotalElements());
+
+        rs.setMeta(mt);
+
+        // remove sensitive data
+        List<ResUserDTO> listUser = pageUser.getContent()
+                .stream().map(item -> this.convertToResUserDTO(item))
+                .collect(Collectors.toList());
+
+        rs.setResult(listUser);
+
+        return rs;
     }
 
     public User handleUpdateUser(User reqUser) {
         User currentUser = this.fetchUserById(reqUser.getId());
         if (currentUser != null) {
-            currentUser.setEmail(reqUser.getEmail());
+
             currentUser.setName(reqUser.getName());
-            currentUser.setPassword(reqUser.getPassword());
+
             // update
             currentUser = this.userRepository.save(currentUser);
         }
@@ -53,8 +80,48 @@ public class UserService {
     public User handleGetUserByUsername(String username) {
         return this.userRepository.findByEmail(username);
     }
-    public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
+
+    public boolean isEmailExist(String email) {
+        return this.userRepository.existsByEmail(email);
     }
 
+    public ResCreateUserDTO convertToResCreateUserDTO(User user) {
+        ResCreateUserDTO res = new ResCreateUserDTO();
+
+        res.setId(user.getId());
+        res.setEmail(user.getEmail());
+        res.setName(user.getName());
+
+        return res;
+    }
+
+    public ResUpdateUserDTO convertToResUpdateUserDTO(User user) {
+        ResUpdateUserDTO res = new ResUpdateUserDTO();
+
+        res.setId(user.getId());
+        res.setName(user.getName());
+        return res;
+    }
+
+    public ResUserDTO convertToResUserDTO(User user) {
+        ResUserDTO res = new ResUserDTO();
+
+        res.setId(user.getId());
+        res.setEmail(user.getEmail());
+        res.setName(user.getName());
+
+        return res;
+    }
+
+    public void updateUserToken(String token, String email) {
+        User currentUser = this.handleGetUserByUsername(email);
+        if (currentUser != null) {
+            currentUser.setRefreshToken(token);
+            this.userRepository.save(currentUser);
+        }
+    }
+
+    public User getUserByRefreshTokenAndEmail(String token, String email) {
+        return this.userRepository.findByRefreshTokenAndEmail(token, email);
+    }
 }

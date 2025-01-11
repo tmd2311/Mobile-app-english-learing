@@ -1,8 +1,8 @@
-package utc.englishlearning.Encybara.domain.dto;
+package utc.englishlearning.Encybara.domain.request;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class LoginDTO {
+public class ReqLoginDTO {
     @NotBlank(message = "username không được để trống")
     private String username;
 
