@@ -17,14 +17,13 @@ public class QuestionController {
     @Autowired
     private QuestionService questionService;
 
-    @GetMapping
-    public ResponseEntity<List<Question>> getAllQuestions() {
-        return ResponseEntity.ok(questionService.getAllQuestions());
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<Question> getQuestionById(@PathVariable Long id) {
-        return ResponseEntity.ok(questionService.getQuestionById(id));
+        Question question = questionService.getQuestionById(id);
+        if (question == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(question);
     }
 
     @PostMapping
@@ -39,12 +38,10 @@ public class QuestionController {
             @RequestBody ResUpdateQuestionDTO questionDTO) {
         questionDTO.setId(id);
         ResUpdateQuestionDTO updatedQuestionDTO = questionService.updateQuestion(id, questionDTO);
+        if (updatedQuestionDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(updatedQuestionDTO);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
-        questionService.deleteQuestion(id);
-        return ResponseEntity.noContent().build();
-    }
 }

@@ -1,5 +1,6 @@
 package utc.englishlearning.Encybara.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,6 +13,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.FetchType;
 import java.util.List;
+import jakarta.persistence.CascadeType;
 
 @Entity
 @Table(name = "questions")
@@ -32,7 +34,8 @@ public class Question {
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
     private List<Lesson_Question> lessonQuestions;
 
-    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Question_Choice> questionChoices;
 
     @OneToOne(mappedBy = "question", fetch = FetchType.LAZY)

@@ -49,14 +49,54 @@ public class QuestionService {
     }
 
     public ResUpdateQuestionDTO updateQuestion(Long id, ResUpdateQuestionDTO questionDTO) {
-        Question question = new Question();
-        question.setId(id);
+        Question question = questionRepository.findById(id).orElse(null);
+        if (question == null) {
+            return null; // Hoặc xử lý lỗi nếu không tìm thấy câu hỏi
+        }
         question.setQuesContent(questionDTO.getQuesContent());
         question.setKeyword(questionDTO.getKeyword());
         question.setQuesType(questionDTO.getQuesType());
         question.setPoint(questionDTO.getPoint());
+
         // Cập nhật câu hỏi
         Question updatedQuestion = questionRepository.save(question);
+
+        // Lấy các lựa chọn hiện có theo ID câu hỏi
+        List<Question_Choice> existingChoices = questionChoiceRepository.findByQuestionId(id);
+
+        // Cập nhật các lựa chọn câu hỏi
+        List<Question_Choice> choices = questionDTO.getQuestionChoices();
+
+        // Xóa các lựa chọn cũ không còn trong danh sách mới
+        for (Question_Choice existingChoice : existingChoices) {
+            boolean exists = choices.stream()
+                    .anyMatch(c -> c.getChoiceContent().equals(existingChoice.getChoiceContent()));
+            if (!exists) {
+                questionChoiceRepository.delete(existingChoice);
+            }
+        }
+
+        // Thêm hoặc cập nhật các lựa chọn mới
+        for (Question_Choice choice : choices) {
+            Question_Choice existingChoice = existingChoices.stream()
+                    .filter(c -> c.getChoiceContent().equals(choice.getChoiceContent()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (existingChoice != null) {
+                // Cập nhật lựa chọn hiện có
+                existingChoice.setChoiceKey(choice.isChoiceKey());
+                questionChoiceRepository.save(existingChoice);
+            } else {
+                // Thêm lựa chọn mới
+                Question_Choice newChoice = new Question_Choice();
+                newChoice.setChoiceContent(choice.getChoiceContent());
+                newChoice.setChoiceKey(choice.isChoiceKey());
+                newChoice.setQuestion(question); // Gán câu hỏi cho lựa chọn mới
+                questionChoiceRepository.save(newChoice);
+            }
+        }
+
         // Chuyển đổi lại thành DTO để trả về
         questionDTO.setId(updatedQuestion.getId());
         return questionDTO;
