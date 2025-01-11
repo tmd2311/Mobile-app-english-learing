@@ -38,13 +38,13 @@ public class SecurityUtil {
 
     public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS512;
 
-    @Value("${hoidanit.jwt.base64-secret}")
+    @Value("${englishlearning.jwt.base64-secret}")
     private String jwtKey;
 
-    @Value("${hoidanit.jwt.access-token-validity-in-seconds}")
+    @Value("${englishlearning.jwt.access-token-validity-in-seconds}")
     private long accessTokenExpiration;
 
-    @Value("${hoidanit.jwt.refresh-token-validity-in-seconds}")
+    @Value("${englishlearning.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
     public String createAccessToken(String email, ResLoginDTO dto) {
@@ -57,10 +57,10 @@ public class SecurityUtil {
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
         // hardcode permission (for testing)
-        List<String> listAuthority = new ArrayList<String>();
+        // List<String> listAuthority = new ArrayList<String>();
 
-        listAuthority.add("ROLE_USER_CREATE");
-        listAuthority.add("ROLE_USER_UPDATE");
+        // listAuthority.add("ROLE_USER_CREATE");
+        // listAuthority.add("ROLE_USER_UPDATE");
 
         // @formatter:off
         JwtClaimsSet claims = JwtClaimsSet.builder()
@@ -68,7 +68,7 @@ public class SecurityUtil {
             .expiresAt(validity)
             .subject(email)
             .claim("user", userToken)
-            .claim("permission", listAuthority)
+            // .claim("permission", listAuthority)
             .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

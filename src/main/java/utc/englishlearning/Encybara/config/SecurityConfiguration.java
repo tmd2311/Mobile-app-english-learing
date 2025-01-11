@@ -6,7 +6,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,6 +23,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
 
+import utc.englishlearning.Encybara.util.SecurityUtil;
+
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
@@ -36,10 +38,15 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
+
         String[] whiteList = {
                 "/",
-                "/api/v1/auth/login", "/api/v1/auth/register",
+                "/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/register",
+                "/storage/**",
+                "/api/v1/email/**",
                 "/v3/api-docs/**",
                 "/swagger-ui/**",
                 "/swagger-ui.html"
@@ -47,19 +54,51 @@ public class SecurityConfiguration {
 
         http
                 .csrf(c -> c.disable())
-                .cors()
-                .and()
-                .authorizeHttpRequests(authz -> authz
-                        .requestMatchers(whiteList).permitAll()
-                        .anyRequest().authenticated())
+                .cors(Customizer.withDefaults())
+                .authorizeHttpRequests(
+                        authz -> authz
+                                .requestMatchers(whiteList).permitAll()
+                                // .requestMatchers(HttpMethod.GET, "/api/v1/companies/**").permitAll()
+                                // .requestMatchers(HttpMethod.GET, "/api/v1/jobs/**").permitAll()
+                                // .requestMatchers(HttpMethod.GET, "/api/v1/skills/**").permitAll()
+
+                                .anyRequest().authenticated())
+                .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
+                        .authenticationEntryPoint(customAuthenticationEntryPoint))
+                // .exceptionHandling(
+                // exceptions -> exceptions
+                // .authenticationEntryPoint(customAuthenticationEntryPoint) // 401
+                // .accessDeniedHandler(new BearerTokenAccessDeniedHandler())) // 403
+
+                .formLogin(f -> f.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
     }
 
     @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        grantedAuthoritiesConverter.setAuthorityPrefix("");
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("permission");
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
+    }
+
+    @Bean
     public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withSecretKey(getSecretKey()).build();
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(
+                getSecretKey()).macAlgorithm(SecurityUtil.JWT_ALGORITHM).build();
+        return token -> {
+            try {
+                return jwtDecoder.decode(token);
+            } catch (Exception e) {
+                System.out.println(">>> JWT error: " + e.getMessage());
+                throw e;
+            }
+        };
     }
 
     @Bean
@@ -69,6 +108,8 @@ public class SecurityConfiguration {
 
     private SecretKey getSecretKey() {
         byte[] keyBytes = Base64.from(jwtKey).decode();
-        return new SecretKeySpec(keyBytes, 0, keyBytes.length, "HmacSHA256");
+        return new SecretKeySpec(keyBytes, 0, keyBytes.length,
+                SecurityUtil.JWT_ALGORITHM.getName());
     }
+
 }
