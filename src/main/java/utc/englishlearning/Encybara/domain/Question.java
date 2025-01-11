@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import utc.englishlearning.Encybara.util.constant.QuestionTypeEnum;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.FetchType;
@@ -22,7 +23,7 @@ public class Question {
     private long id;
     private String quesContent;
     private String keyword;
-    private String quesType;
+    private QuestionTypeEnum quesType;
     private int point;
 
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
