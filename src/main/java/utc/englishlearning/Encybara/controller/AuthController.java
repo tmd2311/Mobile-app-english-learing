@@ -18,6 +18,7 @@ import utc.englishlearning.Encybara.util.SecurityUtil;
 
 @RestController
 public class AuthController {
+
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
     private final PasswordEncoder passwordEncoder;
@@ -28,6 +29,7 @@ public class AuthController {
         this.securityUtil = securityUtil;
         this.passwordEncoder = passwordEncoder;
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<ResLoginDTO> login(@Valid @RequestBody LoginDTO loginDto) {

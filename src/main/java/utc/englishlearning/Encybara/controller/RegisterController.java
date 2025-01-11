@@ -7,17 +7,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import utc.englishlearning.Encybara.domain.RestResponse;
 import utc.englishlearning.Encybara.domain.User;
 import utc.englishlearning.Encybara.domain.dto.ErrorResponseDTO;
 import utc.englishlearning.Encybara.domain.dto.OtpVerificationRequest;
 import utc.englishlearning.Encybara.domain.dto.RegisterDTO;
-import utc.englishlearning.Encybara.domain.dto.ResLoginDTO;
 import utc.englishlearning.Encybara.service.EmailService;
 import utc.englishlearning.Encybara.service.OtpService;
 import utc.englishlearning.Encybara.service.UserService;
-import org.springframework.http.HttpStatus;
-import utc.englishlearning.Encybara.util.error.IdInvalidException;
+
 
 @RestController
 public class RegisterController {

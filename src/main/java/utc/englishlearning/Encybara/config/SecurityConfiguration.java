@@ -19,11 +19,12 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
 
 import utc.englishlearning.Encybara.util.SecurityUtil;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
@@ -36,7 +37,17 @@ public class SecurityConfiguration {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    private static final String[] WHITELIST_URLS = {
+            "/static/**",
+            "/auth/**",
+            "/vendors/**",
+            "/vendors/css/**",
+            "/vendors/mdi/css/**",
+            "/vendors/js/**",
+            "/css/maps/**",
+            "/js/**",
+            "/images/**"
+    };
     @Bean
     public SecurityFilterChain filterChain(
             HttpSecurity http,
@@ -45,11 +56,15 @@ public class SecurityConfiguration {
                 .csrf(c -> c.disable())
                 .authorizeHttpRequests(
                         authz -> authz
-                                .requestMatchers("/", "/login", "/register", "/email", "/verify-otp").permitAll() // Allow access to /register
+                                .requestMatchers("/", "/login", "/register", "/email", "/verify-otp", Arrays.toString(WHITELIST_URLS)).permitAll() // Allow access to /register
                                 .anyRequest().authenticated())
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(customAuthenticationEntryPoint))
-                .formLogin(f -> f.disable())
+                .formLogin(f -> f
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/dashboard", true)
+                        .permitAll()
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
