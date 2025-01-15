@@ -112,16 +112,18 @@ public class AuthController {
         }
 
         @PostMapping("/logout")
-        public ResponseEntity<Void> logout() throws IdInvalidException {
+        public ResponseEntity<String> logout() throws IdInvalidException {
                 String email = SecurityUtil.getCurrentUserLogin().orElse("");
 
                 if (email.isEmpty()) {
                         throw new IdInvalidException("Access Token không hợp lệ");
                 }
 
-                this.userService.updateUserToken(null, email);
+                // Vô hiệu hóa các token
+                this.userService.invalidateTokens(email);
 
-                ResponseCookie deleteSpringCookie = ResponseCookie
+                // Xóa cookie refresh_token
+                ResponseCookie deleteRefreshTokenCookie = ResponseCookie
                                 .from("refresh_token", "")
                                 .httpOnly(true)
                                 .secure(true)
@@ -129,9 +131,19 @@ public class AuthController {
                                 .maxAge(0)
                                 .build();
 
+                // Xóa cookie access_token nếu có
+                ResponseCookie deleteAccessTokenCookie = ResponseCookie
+                                .from("access_token", "")
+                                .httpOnly(true)
+                                .secure(true)
+                                .path("/")
+                                .maxAge(0)
+                                .build();
+
                 return ResponseEntity.ok()
-                                .header(HttpHeaders.SET_COOKIE, deleteSpringCookie.toString())
-                                .body(null);
+                                .header(HttpHeaders.SET_COOKIE, deleteRefreshTokenCookie.toString())
+                                .header(HttpHeaders.SET_COOKIE, deleteAccessTokenCookie.toString())
+                                .body("Đăng xuất thành công");
         }
 
         @PostMapping("/register")

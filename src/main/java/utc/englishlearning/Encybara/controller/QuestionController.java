@@ -36,13 +36,11 @@ public class QuestionController {
         return ResponseEntity.ok(createdQuestion);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ResUpdateQuestionDTO> updateQuestion(@PathVariable Long id,
-            @RequestBody ResUpdateQuestionDTO questionDTO) {
-        questionDTO.setId(id);
-        ResUpdateQuestionDTO updatedQuestionDTO = questionService.updateQuestion(id, questionDTO);
+    @PutMapping
+    public ResponseEntity<?> updateQuestion(@RequestBody ResUpdateQuestionDTO questionDTO) {
+        ResUpdateQuestionDTO updatedQuestionDTO = questionService.updateQuestion(questionDTO);
         if (updatedQuestionDTO == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body("Không tìm thấy câu hỏi");
         }
         return ResponseEntity.ok(updatedQuestionDTO);
     }
