@@ -37,14 +37,20 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
             return body;
         }
 
+        // Nếu status >= 400, tức là có lỗi
         if (status >= 400) {
-            return body;
-        } else {
+            res.setError("An error occurred");
+            res.setMessage("Error during processing");
             res.setData(body);
-            res.setMessage("CALL API SUCCESS");
+            return res;
+        } else {
+            // Nếu không có lỗi (status < 400), chỉ trả về message và data mà không có error\
+//            res.setError(null);
+//            res.setData(body);
+//            res.setMessage("CALL API SUCCESS");
+            return body;
         }
 
-        return res;
     }
 
 }

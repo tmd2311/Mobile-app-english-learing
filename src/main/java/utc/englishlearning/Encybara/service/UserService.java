@@ -139,4 +139,15 @@ public class UserService {
     public User getUserByRefreshTokenAndEmail(String token, String email) {
         return this.userRepository.findByRefreshTokenAndEmail(token, email);
     }
+    public boolean updateUserPassword(String email, String password) {
+        User currentUser = this.handleGetUserByUsername(email);
+        if (currentUser != null) {
+            currentUser.setPassword(password);
+            userRepository.save(currentUser);
+            return true;
+        }
+        return false;
+    }
+
+
 }

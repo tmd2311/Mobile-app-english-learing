@@ -9,6 +9,7 @@ import java.util.Optional;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.nimbusds.jose.JWSHeader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -196,5 +197,36 @@ public class SecurityUtil {
     // private static Stream<String> getAuthorities(Authentication authentication) {
     //     return authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority);
     // }
+
+
+    /**
+     * create token by email for reset password and check valid token
+     */
+    public String creatResetPasswordToken(String email) {
+
+        Instant now = Instant.now();
+        Instant validity = now.plus(10, ChronoUnit.MINUTES);
+
+        JwtClaimsSet claims= JwtClaimsSet.builder()
+                .issuedAt(now)
+                .expiresAt(validity)
+                .subject(email)
+                .build();
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
+    public Jwt checkValidResetPasswordToken(String token) {
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(getSecretKey())
+                .macAlgorithm(SecurityUtil.JWT_ALGORITHM)
+                .build();
+        try{
+            return jwtDecoder.decode(token);
+        }catch (Exception e){
+            throw new RuntimeException("Invalid or expired token");
+        }
+    }
+
+
 
 }

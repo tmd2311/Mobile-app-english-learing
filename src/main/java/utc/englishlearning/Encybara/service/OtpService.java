@@ -1,53 +1,68 @@
 package utc.englishlearning.Encybara.service;
 
 import org.springframework.stereotype.Service;
+import utc.englishlearning.Encybara.domain.request.OtpVerificationRequest;
 import utc.englishlearning.Encybara.domain.response.ResCreateUserDTO;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class OtpService {
-    private final Map<String, String> otpStorage = new ConcurrentHashMap<>();
-    private final Map<String, ResCreateUserDTO> pendingRegistration = new ConcurrentHashMap<>();
-    private final Map<String, Long> otpTimestamps = new ConcurrentHashMap<>();
+    private final Map<String, OtpVerificationRequest> otpStorage = new ConcurrentHashMap<>();
     private static final long OTP_EXPIRATION_TIME = 5 * 60 * 1000; // 5 phút
 
     public String generateOtp(String email) {
-        String otp = String.valueOf((int) (Math.random() * 900000 + 100000));
-        otpStorage.put(email, otp);
-        otpTimestamps.put(email, System.currentTimeMillis());
-        return otp;
+        return String.valueOf((int) (Math.random() * 900000 + 100000));
     }
 
-    // Xác thực OTP
-    public boolean validateOtp(String email, String otp) {
-        // Kiểm tra xem OTP có tồn tại trong bộ nhớ hay không
-        String storedOtp = otpStorage.get(email);
-        if (storedOtp == null) {
-            return false;
+
+
+    public String saveRegisterData(String email, ResCreateUserDTO registerDTO, String otp) {
+
+        String otpID= UUID.randomUUID().toString().replace("-", "").substring(0, 6).toUpperCase();
+        long tempTimestamp = System.currentTimeMillis();
+
+        OtpVerificationRequest otpData= new OtpVerificationRequest(otpID, otp, email, registerDTO, tempTimestamp);
+        otpStorage.put(otpID, otpData);
+        return otpID;
+    }
+
+    public void updateOtp(String otpID, String newOTP){
+        OtpVerificationRequest otpData = otpStorage.get(otpID);
+        if(otpData != null){
+            otpData.setOtp(newOTP);
+            otpData.setTimestamp(System.currentTimeMillis());
         }
-        Long timestamp = otpTimestamps.get(email);
-        if (timestamp == null) {
-            return false;
+    }
+
+    public OtpVerificationRequest getOtpData(String otpID) {
+        OtpVerificationRequest otpData = otpStorage.get(otpID);
+        if(otpData == null) {
+            return null;
         }
-        if (storedOtp.equals(otp)) {
-            long currentTime = System.currentTimeMillis();
-            if (currentTime - timestamp <= OTP_EXPIRATION_TIME) {
-                otpStorage.remove(email);
-                otpTimestamps.remove(email);
-                return true;
-            }
+        long currentTime = System.currentTimeMillis();
+        if(currentTime - otpData.getTimestamp() > OTP_EXPIRATION_TIME) {
+            otpStorage.remove(otpID);
+            return null;
         }
-        return false;
+        return otpData;
     }
 
-    public void saveRegisterData(String email, ResCreateUserDTO registerDTO) {
-        pendingRegistration.put(email, registerDTO);
+
+    //    // Xác thực OTP
+    public boolean validateOtp(String otpID, String otp) {
+
+        OtpVerificationRequest otpData = getOtpData(otpID);
+        System.out.println(otp+"  " + otpData.getOtp());
+        if( !otpData.getOtp().equals(otp)) {
+            return false; // otpData rỗng hoặc otp không đúng
+        }
+        return true;
     }
 
-    public ResCreateUserDTO getRegisterData(String email) {
-        return pendingRegistration.remove(email);
+    public OtpVerificationRequest removeOtpData(String otpID) {
+        return otpStorage.remove(otpID);
     }
-
 }

@@ -38,7 +38,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         String errorMessage = Optional.ofNullable(authException.getCause()) // NULL
                 .map(Throwable::getMessage)
                 .orElse(authException.getMessage());
-        res.setError(errorMessage);
 
         res.setMessage("Token không hợp lệ (hết hạn, không đúng định dạng, hoặc không truyền JWT ở header)...");
 
