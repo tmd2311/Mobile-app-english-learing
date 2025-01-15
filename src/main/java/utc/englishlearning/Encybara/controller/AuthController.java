@@ -154,7 +154,7 @@ public class AuthController {
                 RegisterReponseDTO registerReponseDTO = new RegisterReponseDTO(
                         "OTP sent to your email. Please verify to complete registration.",
                         otpID,
-                        "Time life: 5:00 minutes"
+                        "Expires in 5 minutes"
                 );
                 return ResponseEntity.ok(registerReponseDTO);
         }
@@ -178,7 +178,7 @@ public class AuthController {
                 RegisterReponseDTO registerReponseDTO = new RegisterReponseDTO(
                         "A new OTP has been sent to your email. Please verify to complete registration.",
                         otpID,
-                        "Time life: 5:00 minutes"
+                        "Expires in 5 minutes"
                 );
                 return ResponseEntity.ok(registerReponseDTO);
 

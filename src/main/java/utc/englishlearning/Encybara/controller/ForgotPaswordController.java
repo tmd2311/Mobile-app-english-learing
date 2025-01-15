@@ -59,7 +59,7 @@ public class ForgotPaswordController {
         return ResponseEntity.ok(new  RegisterReponseDTO(
                 "OTP sent to your email. Please verify to complete registration.",
                 otpID,
-                "Time life: 5:00 minutes"
+                "Expires in 5 minutes"
         ));
     }
 
