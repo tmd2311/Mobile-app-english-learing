@@ -8,8 +8,6 @@ import utc.englishlearning.Encybara.service.QuestionService;
 import utc.englishlearning.Encybara.domain.response.question.ResCreateQuestionDTO;
 import utc.englishlearning.Encybara.domain.response.question.ResUpdateQuestionDTO;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/questions")
 public class QuestionController {

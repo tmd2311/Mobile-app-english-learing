@@ -1,6 +1,5 @@
 package utc.englishlearning.Encybara.domain.request;
 
-import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 
