@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class OtpService {
     private final Map<String, OtpVerificationRequest> otpStorage = new ConcurrentHashMap<>();
-    private static final long OTP_EXPIRATION_TIME = 5 * 60 * 1000; // 5 phút
+    private static final long OTP_EXPIRATION_TIME = 1 * 60 * 1000; // 5 phút
 
     public String generateOtp(String email) {
         return String.valueOf((int) (Math.random() * 900000 + 100000));
