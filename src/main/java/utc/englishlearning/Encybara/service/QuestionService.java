@@ -1,6 +1,7 @@
 package utc.englishlearning.Encybara.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import utc.englishlearning.Encybara.domain.Question;
 import utc.englishlearning.Encybara.repository.QuestionRepository;
@@ -8,6 +9,8 @@ import utc.englishlearning.Encybara.domain.Question_Choice;
 import utc.englishlearning.Encybara.repository.QuestionChoiceRepository;
 import utc.englishlearning.Encybara.domain.response.question.ResCreateQuestionDTO;
 import utc.englishlearning.Encybara.domain.response.question.ResUpdateQuestionDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -104,5 +107,9 @@ public class QuestionService {
 
     public void deleteQuestion(Long id) {
         questionRepository.deleteById(id);
+    }
+
+    public Page<Question> getAllQuestions(Specification<Question> spec, Pageable pageable) {
+        return questionRepository.findAll(spec, pageable);
     }
 }
