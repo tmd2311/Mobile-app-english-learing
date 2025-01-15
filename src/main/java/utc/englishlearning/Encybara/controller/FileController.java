@@ -61,6 +61,9 @@ public class FileController {
             throw new StorageException("File is empty. Please upload a file.");
         }
         String fileName = file.getOriginalFilename();
+        if (fileName == null) {
+            throw new StorageException("File name is null. Please upload a valid file.");
+        }
         List<String> allowedExtensions = Arrays.asList("pdf", "jpg", "jpeg", "png", "doc", "docx", "mp3");
         boolean isValid = allowedExtensions.stream().anyMatch(item -> fileName.toLowerCase().endsWith(item));
 
