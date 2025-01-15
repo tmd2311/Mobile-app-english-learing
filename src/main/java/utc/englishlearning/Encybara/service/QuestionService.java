@@ -106,6 +106,11 @@ public class QuestionService {
     }
 
     public void deleteQuestion(Long id) {
+        // Xóa tất cả các lựa chọn liên quan đến câu hỏi
+        List<Question_Choice> choices = questionChoiceRepository.findByQuestionId(id);
+        questionChoiceRepository.deleteAll(choices);
+
+        // Xóa câu hỏi
         questionRepository.deleteById(id);
     }
 

@@ -21,10 +21,10 @@ public class QuestionController {
     private QuestionService questionService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Question> getQuestionById(@PathVariable Long id) {
+    public ResponseEntity<?> getQuestionById(@PathVariable Long id) {
         Question question = questionService.getQuestionById(id);
         if (question == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body("Không tìm thấy câu hỏi");
         }
         return ResponseEntity.ok(question);
     }
@@ -65,6 +65,12 @@ public class QuestionController {
 
         Page<Question> questions = questionService.getAllQuestions(spec, pageable);
         return ResponseEntity.ok(questions);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
+        questionService.deleteQuestion(id);
+        return ResponseEntity.ok("Đã xóa thành công");
     }
 
 }
