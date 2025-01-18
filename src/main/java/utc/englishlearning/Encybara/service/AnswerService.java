@@ -40,6 +40,7 @@ public class AnswerService {
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
 
         Answer answer = new Answer();
+        answer.setQuestion(question);
         answer.setPoint_achieved(0);
         answer = answerRepository.save(answer);
 
