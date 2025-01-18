@@ -3,15 +3,13 @@ package utc.englishlearning.Encybara.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import utc.englishlearning.Encybara.domain.Question;
+import utc.englishlearning.Encybara.domain.request.question.ReqCreateQuestionDTO;
+import utc.englishlearning.Encybara.domain.request.question.ReqUpdateQuestionDTO;
+import utc.englishlearning.Encybara.domain.response.question.ResQuestionDTO;
 import utc.englishlearning.Encybara.service.QuestionService;
-import utc.englishlearning.Encybara.domain.response.question.ResCreateQuestionDTO;
-import utc.englishlearning.Encybara.domain.response.question.ResUpdateQuestionDTO;
-import utc.englishlearning.Encybara.specification.QuestionSpecification;
-import utc.englishlearning.Encybara.util.constant.QuestionTypeEnum;
+import utc.englishlearning.Encybara.domain.response.RestResponse;
 
 @RestController
 @RequestMapping("/api/v1/questions")
@@ -20,55 +18,52 @@ public class QuestionController {
     @Autowired
     private QuestionService questionService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getQuestionById(@PathVariable Long id) {
-        Question question = questionService.getQuestionById(id);
-        if (question == null) {
-            return ResponseEntity.status(404).body("Không tìm thấy câu hỏi");
-        }
-        return ResponseEntity.ok(question);
-    }
-
     @PostMapping
-    public ResponseEntity<Question> createQuestion(
-            @RequestBody ResCreateQuestionDTO questionDTO) {
-        Question createdQuestion = questionService.createQuestion(questionDTO);
-        return ResponseEntity.ok(createdQuestion);
+    public ResponseEntity<RestResponse<ResQuestionDTO>> createQuestion(@RequestBody ReqCreateQuestionDTO questionDTO) {
+        ResQuestionDTO createdQuestion = questionService.createQuestion(questionDTO);
+        RestResponse<ResQuestionDTO> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Question created successfully");
+        response.setData(createdQuestion);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping
-    public ResponseEntity<?> updateQuestion(@RequestBody ResUpdateQuestionDTO questionDTO) {
-        ResUpdateQuestionDTO updatedQuestionDTO = questionService.updateQuestion(questionDTO);
-        if (updatedQuestionDTO == null) {
-            return ResponseEntity.status(404).body("Không tìm thấy câu hỏi");
-        }
-        return ResponseEntity.ok(updatedQuestionDTO);
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<Question>> getAllQuestions(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String content,
-            @RequestParam(required = false) QuestionTypeEnum type,
-            @RequestParam(required = false) Integer point,
-            Pageable pageable) {
-
-        Specification<Question> spec = Specification.where(QuestionSpecification.hasKeyword(keyword))
-                .and(QuestionSpecification.hasQuesContent(content))
-                .and(QuestionSpecification.hasQuesType(type));
-
-        if (point != null) {
-            spec = spec.and(QuestionSpecification.hasPoint(point));
-        }
-
-        Page<Question> questions = questionService.getAllQuestions(spec, pageable);
-        return ResponseEntity.ok(questions);
+    public ResponseEntity<RestResponse<ResQuestionDTO>> updateQuestion(@RequestBody ReqUpdateQuestionDTO questionDTO) {
+        ResQuestionDTO updatedQuestion = questionService.updateQuestion(questionDTO);
+        RestResponse<ResQuestionDTO> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Question updated successfully");
+        response.setData(updatedQuestion);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
+    public ResponseEntity<RestResponse<Void>> deleteQuestion(@PathVariable Long id) {
         questionService.deleteQuestion(id);
-        return ResponseEntity.ok("Đã xóa thành công");
+        RestResponse<Void> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Question deleted successfully");
+        return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<RestResponse<ResQuestionDTO>> getQuestionById(@PathVariable Long id) {
+        ResQuestionDTO question = questionService.getQuestionById(id);
+        RestResponse<ResQuestionDTO> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Question retrieved successfully");
+        response.setData(question);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<RestResponse<Page<ResQuestionDTO>>> getAllQuestions(Pageable pageable) {
+        Page<ResQuestionDTO> questions = questionService.getAllQuestions(pageable);
+        RestResponse<Page<ResQuestionDTO>> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Questions retrieved successfully");
+        response.setData(questions);
+        return ResponseEntity.ok(response);
+    }
 }

@@ -30,6 +30,7 @@ import utc.englishlearning.Encybara.domain.Question;
 import utc.englishlearning.Encybara.domain.Learning_Material;
 import utc.englishlearning.Encybara.repository.LearningMaterialRepository;
 import utc.englishlearning.Encybara.service.QuestionService;
+import utc.englishlearning.Encybara.domain.response.question.ResQuestionDTO;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -122,10 +123,14 @@ public class FileController {
         String fileName = fileService.store(file, "listening"); // Giả sử bạn có thư mục "listening"
 
         // Cập nhật câu hỏi với link mp3
-        Question question = questionService.getQuestionById(questionId);
-        if (question != null) {
+        ResQuestionDTO questionDTO = questionService.getQuestionById(questionId);
+        if (questionDTO != null) {
             Learning_Material learningMaterial = new Learning_Material();
-            learningMaterial.setQuestion(question);
+
+            // Convert ResQuestionDTO to Question
+            Question question = convertToQuestion(questionDTO);
+
+            learningMaterial.setQuestion(question); // Now this works
             learningMaterial.setMaterLink(fileName);
             learningMaterial.setMaterType("audio/mpeg");
             learning_MaterialRepository.save(learningMaterial);
@@ -133,6 +138,19 @@ public class FileController {
 
         ResUploadFileDTO res = new ResUploadFileDTO(fileName, Instant.now());
         return ResponseEntity.ok().body(res);
+    }
+
+    // Method to convert ResQuestionDTO to Question
+    private Question convertToQuestion(ResQuestionDTO questionDTO) {
+        Question question = new Question();
+        question.setId(questionDTO.getId());
+        question.setQuesContent(questionDTO.getQuesContent());
+        question.setKeyword(questionDTO.getKeyword());
+        question.setQuesType(questionDTO.getQuesType());
+        question.setSkillType(questionDTO.getSkillType());
+        question.setPoint(questionDTO.getPoint());
+        // Set other properties if needed
+        return question;
     }
 
     @GetMapping("/files/name/{id}")
