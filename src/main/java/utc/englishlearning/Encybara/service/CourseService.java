@@ -114,6 +114,13 @@ public class CourseService {
         courseRepository.save(course);
     }
 
+    @Transactional
+    public void deleteCourse(Long id) {
+        Course course = courseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+        courseRepository.delete(course);
+    }
+
     private ResCourseDTO convertToDTO(Course course) {
         ResCourseDTO dto = new ResCourseDTO();
         dto.setId(course.getId());

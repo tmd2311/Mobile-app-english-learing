@@ -11,6 +11,8 @@ import utc.englishlearning.Encybara.domain.response.course.ResCourseDTO;
 import utc.englishlearning.Encybara.service.CourseService;
 import utc.englishlearning.Encybara.domain.response.RestResponse;
 import utc.englishlearning.Encybara.domain.request.course.ReqAddLessonsToCourseDTO;
+import utc.englishlearning.Encybara.domain.request.course.ReqRemoveLessonFromCourseDTO;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/v1/courses")
@@ -70,13 +72,22 @@ public class CourseController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{courseId}/lessons/{lessonId}")
+    @DeleteMapping("/{courseId}/lessons")
     public ResponseEntity<RestResponse<Void>> removeLessonFromCourse(@PathVariable Long courseId,
-            @PathVariable Long lessonId) {
-        courseService.removeLessonFromCourse(courseId, lessonId);
+            @RequestBody ReqRemoveLessonFromCourseDTO reqRemoveLessonFromCourseDTO) {
+        courseService.removeLessonFromCourse(courseId, reqRemoveLessonFromCourseDTO.getLessonId());
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(200);
         response.setMessage("Lesson removed from course successfully");
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<RestResponse<Void>> deleteCourse(@PathVariable Long id) {
+        courseService.deleteCourse(id);
+        RestResponse<Void> response = new RestResponse<>();
+        response.setStatusCode(HttpStatus.OK.value());
+        response.setMessage("Course deleted successfully");
         return ResponseEntity.ok(response);
     }
 }
