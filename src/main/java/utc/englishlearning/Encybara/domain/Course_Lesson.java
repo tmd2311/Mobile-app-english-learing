@@ -18,7 +18,6 @@ public class Course_Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id; // Choice_ID
-    private int numLes;
 
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)

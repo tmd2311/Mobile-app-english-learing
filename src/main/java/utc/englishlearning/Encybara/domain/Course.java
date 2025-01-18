@@ -38,6 +38,8 @@ public class Course {
     private String updateBy;
     private Instant updateAt;
 
+    private Integer sumLesson;
+
     @PrePersist
     public void handleBeforeCreate() {
         this.createBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
