@@ -11,14 +11,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="lesson_questions")
+@Table(name = "lesson_questions")
 @Getter
 @Setter
 public class Lesson_Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private int numQues;
 
     @ManyToOne
     @JoinColumn(name = "lesson_id")

@@ -9,7 +9,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import utc.englishlearning.Encybara.domain.RestResponse;
+import utc.englishlearning.Encybara.domain.response.RestResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,8 +21,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<RestResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException ex) {
         RestResponse<Object> res = new RestResponse<>();
         res.setStatusCode(HttpStatus.NOT_FOUND.value());
-        res.setError(ex.getMessage());
-        res.setMessage("Resource not found");
+        res.setError("Resource not found");
+        res.setMessage(ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
     }
 

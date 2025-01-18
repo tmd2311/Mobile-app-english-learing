@@ -15,6 +15,7 @@ import utc.englishlearning.Encybara.domain.response.lesson.ResLessonDTO;
 import utc.englishlearning.Encybara.exception.ResourceNotFoundException;
 import utc.englishlearning.Encybara.repository.LessonRepository;
 import utc.englishlearning.Encybara.repository.QuestionRepository;
+import utc.englishlearning.Encybara.repository.LessonQuestionRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +28,9 @@ public class LessonService {
 
     @Autowired
     private QuestionRepository questionRepository;
+
+    @Autowired
+    private LessonQuestionRepository lessonQuestionRepository;
 
     public ResLessonDTO createLesson(ReqCreateLessonDTO reqCreateLessonDTO) {
         Lesson lesson = new Lesson();
@@ -65,15 +69,14 @@ public class LessonService {
             throw new ResourceNotFoundException("One or more questions not found");
         }
 
-        List<Lesson_Question> lessonQuestions = questions.stream()
-                .map(question -> {
-                    Lesson_Question lessonQuestion = new Lesson_Question();
-                    lessonQuestion.setLesson(lesson);
-                    lessonQuestion.setQuestion(question);
-                    return lessonQuestion;
-                }).collect(Collectors.toList());
+        for (Question question : questions) {
+            Lesson_Question lessonQuestion = new Lesson_Question();
+            lessonQuestion.setLesson(lesson);
+            lessonQuestion.setQuestion(question);
+            lessonQuestionRepository.save(lessonQuestion);
+        }
 
-        lesson.getLessonquestions().addAll(lessonQuestions);
+        lesson.setSumQues(lesson.getLessonquestions().size() + questions.size());
         lessonRepository.save(lesson);
     }
 
@@ -82,7 +85,9 @@ public class LessonService {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
 
-        lesson.getLessonquestions().removeIf(lq -> Long.valueOf(lq.getQuestion().getId()).equals(questionId));
+        lessonQuestionRepository.deleteByLessonIdAndQuestionId(lessonId, questionId);
+
+        lesson.setSumQues(lesson.getLessonquestions().size());
         lessonRepository.save(lesson);
     }
 

@@ -34,6 +34,7 @@ public class Lesson {
     private Instant createAt;
     private String updateBy;
     private Instant updateAt;
+    private Integer sumQues;
 
     @PrePersist
     public void handleBeforeCreate() {
