@@ -128,9 +128,10 @@ public class LessonService {
         dto.setUpdateBy(lesson.getUpdateBy());
         dto.setUpdateAt(lesson.getUpdateAt());
 
-        List<Long> questionIds = lesson.getLessonquestions().stream()
+        List<Long> questionIds = (lesson.getLessonquestions() != null) ? lesson.getLessonquestions().stream()
                 .map(lq -> lq.getQuestion().getId())
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()) : new ArrayList<>();
+
         dto.setQuestionIds(questionIds.isEmpty() ? null : questionIds);
 
         return dto;

@@ -20,6 +20,7 @@ import utc.englishlearning.Encybara.repository.CourseLessonRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 @Service
 public class CourseService {
@@ -136,11 +137,11 @@ public class CourseService {
         dto.setUpdateAt(course.getUpdateAt());
         dto.setSumLesson(course.getSumLesson());
 
-        List<Long> lessonIds = course.getCourselessons().stream()
+        List<Long> lessonIds = (course.getCourselessons() != null) ? course.getCourselessons().stream()
                 .map(cl -> cl.getLesson().getId())
-                .collect(Collectors.toList());
-        dto.setLessonIds(lessonIds.isEmpty() ? null : lessonIds);
+                .collect(Collectors.toList()) : new ArrayList<>();
 
+        dto.setLessonIds(lessonIds.isEmpty() ? null : lessonIds);
         return dto;
     }
 }
