@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="lesson_results")
+@Table(name = "lesson_results")
 @Getter
 @Setter
 
@@ -21,7 +21,9 @@ public class Lesson_Result {
     private long id;
     private long stuTime;
     private String comLevel;
-    private int point;
+
+    private long sessionId;
+    private int totalPoints;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
