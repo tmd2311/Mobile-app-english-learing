@@ -10,4 +10,5 @@ public class ResAnswerDTO {
     private Long questionId;
     private String answerContent;
     private int pointAchieved;
+    private long sessionId;
 }

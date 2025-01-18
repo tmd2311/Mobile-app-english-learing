@@ -24,6 +24,7 @@ public class Answer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id; // Choice_ID
     private int point_achieved;
+    private long sessionId;
 
     @ManyToOne
     @JoinColumn(name = "question_id")

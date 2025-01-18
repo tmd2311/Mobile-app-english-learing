@@ -45,14 +45,20 @@ public class AnswerService {
         Question question = questionRepository.findById(reqCreateAnswerDTO.getQuestionId())
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
 
-        // Lấy user từ SecurityContext
         User user = userRepository.findByEmail(SecurityUtil.getCurrentUserLogin()
                 .orElseThrow(() -> new RuntimeException("User not authenticated")));
 
+        // Tìm các câu trả lời trước đó của người dùng cho câu hỏi này
+        List<Answer> previousAnswers = answerRepository.findByUserAndQuestion(user, question);
+
+        // Tính sessionId mới
+        long newSessionId = previousAnswers.size() + 1;
+
         Answer answer = new Answer();
         answer.setQuestion(question);
-        answer.setUser(user); // Sử dụng setUser thay vì setUserId
+        answer.setUser(user);
         answer.setPoint_achieved(0);
+        answer.setSessionId(newSessionId); // Thiết lập sessionId tự động
         answer = answerRepository.save(answer);
 
         Answer_Text answerText = new Answer_Text();
@@ -127,6 +133,7 @@ public class AnswerService {
         dto.setQuestionId(answer.getQuestion().getId());
         dto.setAnswerContent(answerText.getAnsContent());
         dto.setPointAchieved(answer.getPoint_achieved());
+        dto.setSessionId(answer.getSessionId());
         return dto;
     }
 }
