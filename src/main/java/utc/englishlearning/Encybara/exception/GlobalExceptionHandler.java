@@ -61,4 +61,14 @@ public class GlobalExceptionHandler {
         res.setMessage("Custom exception occurred");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
+
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<RestResponse<Object>> handleResourceAlreadyExistsException(
+            ResourceAlreadyExistsException ex) {
+        RestResponse<Object> res = new RestResponse<>();
+        res.setStatusCode(HttpStatus.CONFLICT.value());
+        res.setError("Resource already exists");
+        res.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(res);
+    }
 }

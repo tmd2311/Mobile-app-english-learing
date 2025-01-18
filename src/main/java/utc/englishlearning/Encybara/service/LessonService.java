@@ -16,9 +16,11 @@ import utc.englishlearning.Encybara.exception.ResourceNotFoundException;
 import utc.englishlearning.Encybara.repository.LessonRepository;
 import utc.englishlearning.Encybara.repository.QuestionRepository;
 import utc.englishlearning.Encybara.repository.LessonQuestionRepository;
+import utc.englishlearning.Encybara.exception.ResourceAlreadyExistsException;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 @Service
 public class LessonService {
@@ -52,6 +54,7 @@ public class LessonService {
     public ResLessonDTO getLessonById(Long id) {
         Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
+
         return convertToDTO(lesson);
     }
 
@@ -69,14 +72,25 @@ public class LessonService {
             throw new ResourceNotFoundException("One or more questions not found");
         }
 
+        List<Long> existingQuestionIds = lesson.getLessonquestions().stream()
+                .map(lq -> lq.getQuestion().getId())
+                .collect(Collectors.toList());
+
+        List<Long> newQuestionIds = new ArrayList<>();
         for (Question question : questions) {
-            Lesson_Question lessonQuestion = new Lesson_Question();
-            lessonQuestion.setLesson(lesson);
-            lessonQuestion.setQuestion(question);
-            lessonQuestionRepository.save(lessonQuestion);
+            if (existingQuestionIds.contains(question.getId())) {
+                throw new ResourceAlreadyExistsException(
+                        "Question with ID " + question.getId() + " already exists in the lesson.");
+            } else {
+                newQuestionIds.add(question.getId());
+                Lesson_Question lessonQuestion = new Lesson_Question();
+                lessonQuestion.setLesson(lesson);
+                lessonQuestion.setQuestion(question);
+                lessonQuestionRepository.save(lessonQuestion);
+            }
         }
 
-        lesson.setSumQues(lesson.getLessonquestions().size() + questions.size());
+        lesson.setSumQues(lesson.getLessonquestions().size() + newQuestionIds.size());
         lessonRepository.save(lesson);
     }
 
@@ -85,8 +99,14 @@ public class LessonService {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
 
-        lessonQuestionRepository.deleteByLessonIdAndQuestionId(lessonId, questionId);
+        boolean exists = lesson.getLessonquestions().stream()
+                .anyMatch(lq -> lq.getQuestion().getId() == questionId);
 
+        if (!exists) {
+            throw new ResourceNotFoundException("Question with ID " + questionId + " does not exist in the lesson.");
+        }
+
+        lessonQuestionRepository.deleteByLessonIdAndQuestionId(lessonId, questionId);
         lesson.setSumQues(lesson.getLessonquestions().size());
         lessonRepository.save(lesson);
     }
@@ -107,6 +127,12 @@ public class LessonService {
         dto.setCreateAt(lesson.getCreateAt());
         dto.setUpdateBy(lesson.getUpdateBy());
         dto.setUpdateAt(lesson.getUpdateAt());
+
+        List<Long> questionIds = lesson.getLessonquestions().stream()
+                .map(lq -> lq.getQuestion().getId())
+                .collect(Collectors.toList());
+        dto.setQuestionIds(questionIds.isEmpty() ? null : questionIds);
+
         return dto;
     }
 }

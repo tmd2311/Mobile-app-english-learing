@@ -5,6 +5,7 @@ import lombok.Setter;
 import utc.englishlearning.Encybara.util.constant.SkillTypeEnum;
 
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,4 +17,5 @@ public class ResLessonDTO {
     private Instant createAt;
     private String updateBy;
     private Instant updateAt;
+    private List<Long> questionIds;
 }
