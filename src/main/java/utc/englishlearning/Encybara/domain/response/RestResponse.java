@@ -1,11 +1,12 @@
 package utc.englishlearning.Encybara.domain.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RestResponse<T> {
     private int statusCode;
     private String error;
-
-    // message có thể là string, hoặc arrayList
-    private Object message;
+    private String message;
     private T data;
 
     public int getStatusCode() {
@@ -24,11 +25,11 @@ public class RestResponse<T> {
         this.error = error;
     }
 
-    public Object getMessage() {
+    public String getMessage() {
         return message;
     }
 
-    public void setMessage(Object message) {
+    public void setMessage(String message) {
         this.message = message;
     }
 

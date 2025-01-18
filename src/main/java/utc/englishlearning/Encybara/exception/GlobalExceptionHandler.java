@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
         res.setError("Validation error");
 
         List<String> errors = fieldErrors.stream().map(FieldError::getDefaultMessage).collect(Collectors.toList());
-        res.setMessage(errors.size() > 1 ? errors : errors.get(0));
+        res.setMessage(String.join(", ", errors));
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
