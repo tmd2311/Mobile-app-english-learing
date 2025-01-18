@@ -17,5 +17,6 @@ public class ResLessonDTO {
     private Instant createAt;
     private String updateBy;
     private Instant updateAt;
+    private Integer sumQues;
     private List<Long> questionIds;
 }

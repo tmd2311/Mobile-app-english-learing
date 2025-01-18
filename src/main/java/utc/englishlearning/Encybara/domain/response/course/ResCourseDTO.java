@@ -2,6 +2,8 @@ package utc.englishlearning.Encybara.domain.response.course;
 
 import lombok.Getter;
 import lombok.Setter;
+import utc.englishlearning.Encybara.util.constant.CourseTypeEnum;
+import utc.englishlearning.Encybara.util.constant.SpecialFieldEnum;
 
 import java.time.Instant;
 import java.util.List;
@@ -14,8 +16,8 @@ public class ResCourseDTO {
     private String intro;
     private int diffLevel;
     private int recomLevel;
-    private String courseType;
-    private String speciField;
+    private CourseTypeEnum courseType;
+    private SpecialFieldEnum speciField;
     private String createBy;
     private Instant createAt;
     private String updateBy;

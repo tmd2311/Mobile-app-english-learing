@@ -95,6 +95,9 @@ public class CourseService {
                 courseLessonRepository.save(courseLesson);
             }
         }
+
+        // Cập nhật tổng số bài học
+        course.setSumLesson(course.getCourselessons().size());
         courseRepository.save(course);
     }
 
@@ -112,6 +115,9 @@ public class CourseService {
 
         course.getCourselessons().removeIf(cl -> cl.getLesson().getId() == lessonId);
         courseLessonRepository.deleteByLesson_IdAndCourse_Id(lessonId, courseId);
+
+        // Cập nhật tổng số bài học
+        course.setSumLesson(course.getCourselessons().size());
         courseRepository.save(course);
     }
 
