@@ -1,11 +1,24 @@
 package utc.englishlearning.Encybara.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import utc.englishlearning.Encybara.domain.Answer;
+import utc.englishlearning.Encybara.domain.Answer_Text;
+import utc.englishlearning.Encybara.domain.Question;
+import utc.englishlearning.Encybara.domain.response.answer.ResAnswerDTO;
+import utc.englishlearning.Encybara.domain.request.answer.ReqCreateAnswerDTO;
+import utc.englishlearning.Encybara.exception.ResourceNotFoundException;
 import utc.englishlearning.Encybara.repository.AnswerRepository;
+import utc.englishlearning.Encybara.repository.QuestionRepository;
+import utc.englishlearning.Encybara.repository.AnswerTextRepository;
+import utc.englishlearning.Encybara.domain.Question_Choice;
+import utc.englishlearning.Encybara.repository.QuestionChoiceRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AnswerService {
@@ -13,24 +26,85 @@ public class AnswerService {
     @Autowired
     private AnswerRepository answerRepository;
 
-    public List<Answer> getAllAnswers() {
-        return answerRepository.findAll();
+    @Autowired
+    private QuestionRepository questionRepository;
+
+    @Autowired
+    private AnswerTextRepository answerTextRepository;
+
+    @Autowired
+    private QuestionChoiceRepository questionChoiceRepository;
+
+    public ResAnswerDTO createAnswer(ReqCreateAnswerDTO reqCreateAnswerDTO) {
+        Question question = questionRepository.findById(reqCreateAnswerDTO.getQuestionId())
+                .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
+
+        Answer answer = new Answer();
+        answer.setPoint_achieved(0);
+        answer = answerRepository.save(answer);
+
+        Answer_Text answerText = new Answer_Text();
+        answerText.setAnsContent(reqCreateAnswerDTO.getAnswerContent());
+        answerText.setAnswer(answer);
+        answerTextRepository.save(answerText);
+
+        return convertToDTO(answer, answerText);
     }
 
-    public Answer getAnswerById(Long id) {
-        return answerRepository.findById(id).orElse(null);
+    public ResAnswerDTO getAnswerById(Long id) {
+        Answer answer = answerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Answer not found"));
+        Answer_Text answerText = answerTextRepository.findByAnswer(answer)
+                .orElseThrow(() -> new ResourceNotFoundException("Answer text not found"));
+        return convertToDTO(answer, answerText);
     }
 
-    public Answer createAnswer(Answer answer) {
-        return answerRepository.save(answer);
+    public List<Answer> getAnswersByQuestionId(Long questionId) {
+        return answerRepository.findAll().stream()
+                .filter(answer -> Long.valueOf(answer.getQuestion().getId()).equals(questionId))
+                .collect(Collectors.toList());
     }
 
-    public Answer updateAnswer(Long id, Answer answer) {
-        answer.setId(id);
-        return answerRepository.save(answer);
+    public Page<Answer> getAllAnswersByQuestionIdAndUserId(Long questionId, Long userId, Pageable pageable) {
+        List<Answer> allAnswers = answerRepository.findAll();
+
+        // Filter answers by questionId and userId
+        List<Answer> filteredAnswers = allAnswers.stream()
+                .filter(answer -> answer.getQuestion().getId() == questionId && answer.getUser().getId() == userId)
+                .collect(Collectors.toList());
+
+        // Create a Page object
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), filteredAnswers.size());
+        return new PageImpl<>(filteredAnswers.subList(start, end), pageable, filteredAnswers.size());
     }
 
-    public void deleteAnswer(Long id) {
-        answerRepository.deleteById(id);
+    public void gradeAnswer(Long answerId) {
+        Answer answer = answerRepository.findById(answerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Answer not found"));
+
+        // Get the associated question
+        Question question = answer.getQuestion();
+
+        // Get the correct choices for the question
+        List<Question_Choice> choices = questionChoiceRepository.findByQuestionId(question.getId());
+
+        // Check if the answer content matches any correct choice
+        boolean isCorrect = choices.stream()
+                .anyMatch(choice -> choice.getChoiceContent().equals(answer.getAnswerText().getAnsContent())
+                        && choice.isChoiceKey());
+
+        // Update point_achieved based on the result
+        answer.setPoint_achieved(isCorrect ? question.getPoint() : 0);
+        answerRepository.save(answer); // Save the updated answer
+    }
+
+    private ResAnswerDTO convertToDTO(Answer answer, Answer_Text answerText) {
+        ResAnswerDTO dto = new ResAnswerDTO();
+        dto.setId(answer.getId());
+        dto.setQuestionId(answer.getQuestion().getId());
+        dto.setAnswerContent(answerText.getAnsContent());
+        dto.setPointAchieved(answer.getPoint_achieved());
+        return dto;
     }
 }
