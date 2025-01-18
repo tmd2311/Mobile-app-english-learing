@@ -11,8 +11,6 @@ import utc.englishlearning.Encybara.domain.request.answer.ReqCreateAnswerDTO;
 import utc.englishlearning.Encybara.service.AnswerService;
 import utc.englishlearning.Encybara.domain.response.RestResponse;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/answers")
 public class AnswerController {
@@ -41,9 +39,10 @@ public class AnswerController {
     }
 
     @GetMapping("/question/{questionId}")
-    public ResponseEntity<RestResponse<List<Answer>>> getAnswersByQuestionId(@PathVariable Long questionId) {
-        List<Answer> answers = answerService.getAnswersByQuestionId(questionId);
-        RestResponse<List<Answer>> response = new RestResponse<>();
+    public ResponseEntity<RestResponse<Page<Answer>>> getAnswersByQuestionId(
+            @PathVariable Long questionId, Pageable pageable) {
+        Page<Answer> answers = answerService.getAnswersByQuestionId(questionId, pageable);
+        RestResponse<Page<Answer>> response = new RestResponse<>();
         response.setStatusCode(200);
         response.setMessage("Answers retrieved successfully");
         response.setData(answers);
@@ -65,8 +64,8 @@ public class AnswerController {
     public ResponseEntity<RestResponse<Void>> gradeAnswer(@PathVariable Long answerId) {
         answerService.gradeAnswer(answerId);
         RestResponse<Void> response = new RestResponse<>();
-        response.setStatusCode(204);
+        response.setStatusCode(200);
         response.setMessage("Answer graded successfully");
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(response);
     }
 }

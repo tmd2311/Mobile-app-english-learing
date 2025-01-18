@@ -16,6 +16,9 @@ import utc.englishlearning.Encybara.repository.QuestionRepository;
 import utc.englishlearning.Encybara.repository.AnswerTextRepository;
 import utc.englishlearning.Encybara.domain.Question_Choice;
 import utc.englishlearning.Encybara.repository.QuestionChoiceRepository;
+import utc.englishlearning.Encybara.util.SecurityUtil;
+import utc.englishlearning.Encybara.domain.User;
+import utc.englishlearning.Encybara.repository.UserRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,12 +38,20 @@ public class AnswerService {
     @Autowired
     private QuestionChoiceRepository questionChoiceRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public ResAnswerDTO createAnswer(ReqCreateAnswerDTO reqCreateAnswerDTO) {
         Question question = questionRepository.findById(reqCreateAnswerDTO.getQuestionId())
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
 
+        // Lấy user từ SecurityContext
+        User user = userRepository.findByEmail(SecurityUtil.getCurrentUserLogin()
+                .orElseThrow(() -> new RuntimeException("User not authenticated")));
+
         Answer answer = new Answer();
         answer.setQuestion(question);
+        answer.setUser(user); // Sử dụng setUser thay vì setUserId
         answer.setPoint_achieved(0);
         answer = answerRepository.save(answer);
 
@@ -98,6 +109,16 @@ public class AnswerService {
         // Update point_achieved based on the result
         answer.setPoint_achieved(isCorrect ? question.getPoint() : 0);
         answerRepository.save(answer); // Save the updated answer
+    }
+
+    public Page<Answer> getAnswersByQuestionId(Long questionId, Pageable pageable) {
+        List<Answer> allAnswers = answerRepository.findAll().stream()
+                .filter(answer -> Long.valueOf(answer.getQuestion().getId()).equals(questionId))
+                .collect(Collectors.toList());
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), allAnswers.size());
+        return new PageImpl<>(allAnswers.subList(start, end), pageable, allAnswers.size());
     }
 
     private ResAnswerDTO convertToDTO(Answer answer, Answer_Text answerText) {
