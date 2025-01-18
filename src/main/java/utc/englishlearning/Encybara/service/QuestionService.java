@@ -1,6 +1,7 @@
 package utc.englishlearning.Encybara.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import utc.englishlearning.Encybara.domain.Question;
 import utc.englishlearning.Encybara.repository.QuestionRepository;
@@ -8,6 +9,10 @@ import utc.englishlearning.Encybara.domain.Question_Choice;
 import utc.englishlearning.Encybara.repository.QuestionChoiceRepository;
 import utc.englishlearning.Encybara.domain.response.question.ResCreateQuestionDTO;
 import utc.englishlearning.Encybara.domain.response.question.ResUpdateQuestionDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import java.time.Instant;
+import utc.englishlearning.Encybara.util.SecurityUtil;
 
 import java.util.List;
 
@@ -48,10 +53,11 @@ public class QuestionService {
         return savedQuestion;
     }
 
-    public ResUpdateQuestionDTO updateQuestion(Long id, ResUpdateQuestionDTO questionDTO) {
+    public ResUpdateQuestionDTO updateQuestion(ResUpdateQuestionDTO questionDTO) {
+        Long id = questionDTO.getId();
         Question question = questionRepository.findById(id).orElse(null);
         if (question == null) {
-            return null; // Hoặc xử lý lỗi nếu không tìm thấy câu hỏi
+            return null;
         }
         question.setQuesContent(questionDTO.getQuesContent());
         question.setKeyword(questionDTO.getKeyword());
@@ -61,13 +67,10 @@ public class QuestionService {
         // Cập nhật câu hỏi
         Question updatedQuestion = questionRepository.save(question);
 
-        // Lấy các lựa chọn hiện có theo ID câu hỏi
-        List<Question_Choice> existingChoices = questionChoiceRepository.findByQuestionId(id);
-
         // Cập nhật các lựa chọn câu hỏi
+        List<Question_Choice> existingChoices = questionChoiceRepository.findByQuestionId(id);
         List<Question_Choice> choices = questionDTO.getQuestionChoices();
 
-        // Xóa các lựa chọn cũ không còn trong danh sách mới
         for (Question_Choice existingChoice : existingChoices) {
             boolean exists = choices.stream()
                     .anyMatch(c -> c.getChoiceContent().equals(existingChoice.getChoiceContent()));
@@ -76,7 +79,6 @@ public class QuestionService {
             }
         }
 
-        // Thêm hoặc cập nhật các lựa chọn mới
         for (Question_Choice choice : choices) {
             Question_Choice existingChoice = existingChoices.stream()
                     .filter(c -> c.getChoiceContent().equals(choice.getChoiceContent()))
@@ -84,25 +86,31 @@ public class QuestionService {
                     .orElse(null);
 
             if (existingChoice != null) {
-                // Cập nhật lựa chọn hiện có
                 existingChoice.setChoiceKey(choice.isChoiceKey());
                 questionChoiceRepository.save(existingChoice);
             } else {
-                // Thêm lựa chọn mới
                 Question_Choice newChoice = new Question_Choice();
                 newChoice.setChoiceContent(choice.getChoiceContent());
                 newChoice.setChoiceKey(choice.isChoiceKey());
-                newChoice.setQuestion(question); // Gán câu hỏi cho lựa chọn mới
+                newChoice.setQuestion(question);
                 questionChoiceRepository.save(newChoice);
             }
         }
 
-        // Chuyển đổi lại thành DTO để trả về
         questionDTO.setId(updatedQuestion.getId());
         return questionDTO;
     }
 
     public void deleteQuestion(Long id) {
+        // Xóa tất cả các lựa chọn liên quan đến câu hỏi
+        List<Question_Choice> choices = questionChoiceRepository.findByQuestionId(id);
+        questionChoiceRepository.deleteAll(choices);
+
+        // Xóa câu hỏi
         questionRepository.deleteById(id);
+    }
+
+    public Page<Question> getAllQuestions(Specification<Question> spec, Pageable pageable) {
+        return questionRepository.findAll(spec, pageable);
     }
 }

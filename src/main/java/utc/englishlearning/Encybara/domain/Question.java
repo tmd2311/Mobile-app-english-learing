@@ -9,9 +9,15 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import utc.englishlearning.Encybara.util.constant.QuestionTypeEnum;
+import utc.englishlearning.Encybara.util.constant.SkillTypeEnum;
+import utc.englishlearning.Encybara.util.SecurityUtil;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.FetchType;
+
+import java.time.Instant;
 import java.util.List;
 import jakarta.persistence.CascadeType;
 
@@ -26,7 +32,31 @@ public class Question {
     private String quesContent;
     private String keyword;
     private QuestionTypeEnum quesType;
+    private SkillTypeEnum skillType;
     private int point;
+
+    private String createBy;
+    private Instant createAt;
+    private String updateBy;
+    private Instant updateAt;
+
+    @PrePersist
+    public void handleBeforeCreate() {
+        this.createBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
+
+        this.createAt = Instant.now();
+    }
+
+    @PreUpdate
+    public void handleBeforeUpdate() {
+        this.updateBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
+
+        this.updateAt = Instant.now();
+    }
 
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
     private List<Answer> answers;
@@ -40,7 +70,4 @@ public class Question {
 
     @OneToOne(mappedBy = "question", fetch = FetchType.LAZY)
     private Learning_Material learningMaterial;
-
-    @OneToOne(mappedBy = "question", fetch = FetchType.LAZY)
-    private Skill skill;
 }

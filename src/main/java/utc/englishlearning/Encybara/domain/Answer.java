@@ -1,5 +1,6 @@
 package utc.englishlearning.Encybara.domain;
 
+import java.time.Instant;
 import java.util.List;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,8 +12,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import lombok.Getter;
 import lombok.Setter;
+import utc.englishlearning.Encybara.util.SecurityUtil;
 
 @Entity
 @Table(name = "answers")
@@ -23,6 +26,17 @@ public class Answer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id; // Choice_ID
     private int point_achieved;
+    private String createBy;
+    private Instant createAt;
+
+    @PrePersist
+    public void handleBeforeCreate() {
+        this.createBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
+
+        this.createAt = Instant.now();
+    }
 
     @ManyToOne
     @JoinColumn(name = "question_id")

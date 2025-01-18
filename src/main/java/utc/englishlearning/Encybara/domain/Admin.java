@@ -5,7 +5,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.List;
@@ -20,18 +20,15 @@ public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    
+
     private String name;
     private String password;
     private Integer field;
     private String adminUsername;
 
-    @OneToOne(mappedBy = "admin",fetch = FetchType.LAZY)
-    private History_Admin historyAdmin;
-
-    @OneToMany(mappedBy = "admin",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "admin", fetch = FetchType.LAZY)
     private List<Message> messages;
 
-    @OneToMany(mappedBy = "admin",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "admin", fetch = FetchType.LAZY)
     private List<Role_Permission> rolePermissions;
 }

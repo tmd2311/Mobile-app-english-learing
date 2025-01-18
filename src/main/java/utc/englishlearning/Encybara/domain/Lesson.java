@@ -6,19 +6,19 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import utc.englishlearning.Encybara.util.SecurityUtil;
+import utc.englishlearning.Encybara.util.constant.SkillTypeEnum;
 
 import java.time.Instant;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 
 @Entity
 @Table(name = "lessons")
@@ -29,6 +29,7 @@ public class Lesson {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
+    private SkillTypeEnum skillType;
     private String createBy;
     private Instant createAt;
     private String updateBy;
@@ -51,6 +52,7 @@ public class Lesson {
 
         this.updateAt = Instant.now();
     }
+
     @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY)
     @JsonIgnore
     List<Lesson_Result> lessonResults;
@@ -62,7 +64,4 @@ public class Lesson {
     @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY)
     @JsonIgnore
     List<Course_Lesson> courselesson;
-
-    @OneToOne(mappedBy = "lesson",fetch = FetchType.LAZY)
-    private Skill skill;
 }

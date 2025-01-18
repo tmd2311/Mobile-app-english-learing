@@ -139,6 +139,7 @@ public class UserService {
     public User getUserByRefreshTokenAndEmail(String token, String email) {
         return this.userRepository.findByRefreshTokenAndEmail(token, email);
     }
+
     public boolean updateUserPassword(String email, String password) {
         User currentUser = this.handleGetUserByUsername(email);
         if (currentUser != null) {
@@ -149,5 +150,13 @@ public class UserService {
         return false;
     }
 
+    public void invalidateTokens(String email) {
+        User currentUser = this.handleGetUserByUsername(email);
+        if (currentUser != null) {
+            // Xóa hoặc vô hiệu hóa token
+            currentUser.setRefreshToken(null);
+            this.userRepository.save(currentUser);
+        }
+    }
 
 }

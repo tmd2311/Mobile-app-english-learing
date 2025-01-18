@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -61,6 +61,9 @@ public class FileController {
             throw new StorageException("File is empty. Please upload a file.");
         }
         String fileName = file.getOriginalFilename();
+        if (fileName == null) {
+            throw new StorageException("File name is null. Please upload a valid file.");
+        }
         List<String> allowedExtensions = Arrays.asList("pdf", "jpg", "jpeg", "png", "doc", "docx", "mp3");
         boolean isValid = allowedExtensions.stream().anyMatch(item -> fileName.toLowerCase().endsWith(item));
 
@@ -134,12 +137,12 @@ public class FileController {
 
     @GetMapping("/files/name/{id}")
     @ApiMessage("Get file name by ID")
-    public ResponseEntity<String> getFileNameById(@PathVariable("id") long id) 
+    public ResponseEntity<String> getFileNameById(@PathVariable("id") long id)
             throws StorageException {
-        
+
         // Lấy tên tệp dựa trên ID
         String fileName = this.fileService.getFileNameById(id);
-        
+
         return ResponseEntity.ok(fileName);
     }
 }
