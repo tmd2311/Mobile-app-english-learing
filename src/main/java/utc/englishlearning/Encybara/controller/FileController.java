@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import utc.englishlearning.Encybara.domain.response.file.ResUploadFileDTO;
+import utc.englishlearning.Encybara.exception.StorageException;
 import utc.englishlearning.Encybara.service.FileService;
 import utc.englishlearning.Encybara.util.annotation.ApiMessage;
-import utc.englishlearning.Encybara.util.error.StorageException;
 import utc.englishlearning.Encybara.domain.Question;
 import utc.englishlearning.Encybara.domain.Learning_Material;
 import utc.englishlearning.Encybara.repository.LearningMaterialRepository;

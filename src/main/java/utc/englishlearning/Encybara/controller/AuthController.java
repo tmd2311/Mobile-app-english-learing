@@ -22,13 +22,13 @@ import utc.englishlearning.Encybara.domain.request.OtpVerificationRequest;
 import utc.englishlearning.Encybara.domain.request.RegisterReponseDTO;
 import utc.englishlearning.Encybara.domain.request.ReqLoginDTO;
 import utc.englishlearning.Encybara.domain.response.ResLoginDTO;
+import utc.englishlearning.Encybara.exception.IdInvalidException;
 import utc.englishlearning.Encybara.domain.response.ResCreateUserDTO;
 import utc.englishlearning.Encybara.domain.request.ErrorResponseDTO;
 import utc.englishlearning.Encybara.service.EmailService;
 import utc.englishlearning.Encybara.service.OtpService;
 import utc.englishlearning.Encybara.service.UserService;
 import utc.englishlearning.Encybara.util.SecurityUtil;
-import utc.englishlearning.Encybara.util.error.IdInvalidException;
 
 @RestController
 @RequestMapping("/api/v1/auth")

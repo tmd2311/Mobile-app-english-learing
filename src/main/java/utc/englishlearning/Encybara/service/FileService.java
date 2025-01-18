@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import utc.englishlearning.Encybara.domain.Learning_Material;
+import utc.englishlearning.Encybara.exception.StorageException;
 import utc.englishlearning.Encybara.repository.LearningMaterialRepository;
-import utc.englishlearning.Encybara.util.error.StorageException;
 
 @Service
 public class FileService {
@@ -47,10 +47,12 @@ public class FileService {
         }
 
     }
+
     public String getStoredFileName(String fullPath) {
         Path path = Paths.get(fullPath);
         return path.getFileName().toString();
     }
+
     public String store(MultipartFile file, String folder) throws URISyntaxException, IOException {
         // create unique filename
         String finalName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
@@ -84,6 +86,7 @@ public class FileService {
         File file = new File(path.toString());
         return new InputStreamResource(new FileInputStream(file));
     }
+
     public String getFileNameById(long id) throws StorageException {
         Learning_Material learningMaterial = learningMaterialRepository.findById(id)
                 .orElseThrow(() -> new StorageException("Tệp không tồn tại với ID = " + id));

@@ -38,6 +38,7 @@ public class QuestionService {
         question.setKeyword(questionDTO.getKeyword());
         question.setQuesType(questionDTO.getQuesType());
         question.setPoint(questionDTO.getPoint());
+        question.setSkillType(questionDTO.getSkillType());
 
         // Lưu câu hỏi vào bảng Question
         Question savedQuestion = questionRepository.save(question);
@@ -61,6 +62,7 @@ public class QuestionService {
         question.setKeyword(questionDTO.getKeyword());
         question.setQuesType(questionDTO.getQuesType());
         question.setPoint(questionDTO.getPoint());
+        question.setSkillType(questionDTO.getSkillType());
 
         // Cập nhật câu hỏi
         Question updatedQuestion = questionRepository.save(question);

@@ -22,9 +22,9 @@ import utc.englishlearning.Encybara.domain.response.ResCreateUserDTO;
 import utc.englishlearning.Encybara.domain.response.ResUpdateUserDTO;
 import utc.englishlearning.Encybara.domain.response.ResUserDTO;
 import utc.englishlearning.Encybara.domain.response.ResultPaginationDTO;
+import utc.englishlearning.Encybara.exception.IdInvalidException;
 import utc.englishlearning.Encybara.service.UserService;
 import utc.englishlearning.Encybara.util.annotation.ApiMessage;
-import utc.englishlearning.Encybara.util.error.IdInvalidException;
 
 @RestController
 @RequestMapping("/api/v1")

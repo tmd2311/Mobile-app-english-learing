@@ -1,4 +1,4 @@
-package utc.englishlearning.Encybara.util.error;
+package utc.englishlearning.Encybara.exception;
 
 public class IdInvalidException extends Exception {
     // Constructor that accepts a message
