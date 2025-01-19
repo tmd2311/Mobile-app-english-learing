@@ -92,4 +92,10 @@ public class FileService {
                 .orElseThrow(() -> new StorageException("Tệp không tồn tại với ID = " + id));
         return learningMaterial.getMaterLink(); // Giả sử đây là phương thức để lấy tên tệp
     }
+    public String getFileNameByQuestionId(long id) throws StorageException {
+        Learning_Material learningMaterial = learningMaterialRepository.findByQuestionId(id)
+                .orElseThrow(() -> new StorageException("Tệp không tồn tại với ID = " + id));
+        return learningMaterial.getMaterLink(); // Giả sử đây là phương thức để lấy tên tệp
+    }
+
 }

@@ -153,13 +153,13 @@ public class FileController {
         return question;
     }
 
-    @GetMapping("/files/name/{id}")
+    @GetMapping("/files/names/{id}")
     @ApiMessage("Get file name by ID")
     public ResponseEntity<String> getFileNameById(@PathVariable("id") long id)
             throws StorageException {
 
         // Lấy tên tệp dựa trên ID
-        String fileName = this.fileService.getFileNameById(id);
+        String fileName = this.fileService.getFileNameByQuestionId(id);
 
         return ResponseEntity.ok(fileName);
     }

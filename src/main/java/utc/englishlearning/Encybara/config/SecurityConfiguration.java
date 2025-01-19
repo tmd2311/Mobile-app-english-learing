@@ -51,8 +51,13 @@ public class SecurityConfiguration {
                 "/swagger-ui/**",
                 "/swagger-ui.html",
                 "api/v1/auth/verify-otp", "/api/v1/auth/resend-otp",
-                "/api/v1/forgot-password/send-otp", "/api/v1/forgot-password/verify-otp", "/api/v1/forgot-password/update-password"
-
+                "/api/v1/forgot-password/**",
+                "/api/v1/files/**",
+                "/api/v1/answers/**",
+                "/api/v1/courses/**",
+                "/api/v1/lessons/**",
+                "/api/v1/lesson-results/**",
+                "/api/v1/questions/**"
         };
 
         http
