@@ -47,7 +47,9 @@ public class LessonResultService {
         Lesson lesson = lessonRepository.findById(reqDto.getLessonId())
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
 
-        List<Answer> answers = answerRepository.findByUserAndQuestion_LessonAndSessionId(user, lesson,
+        List<Question> questions = questionRepository.findByLesson(lesson);
+
+        List<Answer> answers = answerRepository.findByUserAndQuestionInAndSessionId(user, questions,
                 reqDto.getSessionId());
         int totalPointsAchieved = answers.stream().mapToInt(Answer::getPoint_achieved).sum();
 
