@@ -51,10 +51,10 @@ public class LessonResultService {
                 reqDto.getSessionId());
         int totalPointsAchieved = answers.stream().mapToInt(Answer::getPoint_achieved).sum();
 
-        int totalPointsPossible = questionRepository.findByLessonId(lesson.getId())
+        int totalPointsPossible = questionRepository.findByLesson(lesson)
                 .stream().mapToInt(Question::getPoint).sum();
 
-        double comLevel = (double) totalPointsAchieved / totalPointsPossible * 100;
+        double comLevel = totalPointsPossible > 0 ? (double) totalPointsAchieved / totalPointsPossible * 100 : 0;
 
         Lesson_Result lessonResult = new Lesson_Result();
         lessonResult.setLesson(lesson);
