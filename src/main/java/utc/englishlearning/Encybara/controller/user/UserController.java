@@ -1,4 +1,4 @@
-package utc.englishlearning.Encybara.controller;
+package utc.englishlearning.Encybara.controller.user;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

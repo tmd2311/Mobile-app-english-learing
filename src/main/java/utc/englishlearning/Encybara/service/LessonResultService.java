@@ -41,9 +41,9 @@ public class LessonResultService {
     private LessonRepository lessonRepository;
 
     public ResLessonResultDTO createLessonResult(ReqCreateLessonResultDTO reqDto) {
-//        User user = userRepository.findByEmail(SecurityUtil.getCurrentUserLogin()
-//                .orElseThrow(() -> new RuntimeException("User not authenticated")));
-        User user = userRepository.findById(reqDto.getUserId()).get();
+        User user = userRepository.findByEmail(SecurityUtil.getCurrentUserLogin()
+                .orElseThrow(() -> new RuntimeException("User not authenticated")));
+//        User user = userRepository.findById(reqDto.getUserId()).get();
 
         Lesson lesson = lessonRepository.findById(reqDto.getLessonId())
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));

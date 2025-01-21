@@ -1,4 +1,4 @@
-package utc.englishlearning.Encybara.controller;
+package utc.englishlearning.Encybara.controller.auth;
 
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
