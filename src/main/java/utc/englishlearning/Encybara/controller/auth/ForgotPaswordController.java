@@ -7,8 +7,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import utc.englishlearning.Encybara.domain.auth.reponse.RegisterReponseDTO;
+import utc.englishlearning.Encybara.domain.auth.request.OtpVerificationRequest;
+import utc.englishlearning.Encybara.domain.auth.request.UpdatePasswordRequest;
 import utc.englishlearning.Encybara.domain.request.*;
-import utc.englishlearning.Encybara.domain.response.ResCreateUserDTO;
+import utc.englishlearning.Encybara.domain.auth.reponse.ResCreateUserDTO;
 
 import utc.englishlearning.Encybara.service.EmailService;
 import utc.englishlearning.Encybara.service.OtpService;

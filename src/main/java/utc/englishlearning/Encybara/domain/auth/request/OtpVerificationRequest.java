@@ -1,8 +1,8 @@
-package utc.englishlearning.Encybara.domain.request;
+package utc.englishlearning.Encybara.domain.auth.request;
 
 import lombok.Getter;
 import lombok.Setter;
-import utc.englishlearning.Encybara.domain.response.ResCreateUserDTO;
+import utc.englishlearning.Encybara.domain.auth.reponse.ResCreateUserDTO;
 
 @Getter
 @Setter
@@ -12,12 +12,14 @@ public class OtpVerificationRequest {
     private String otp;
     private ResCreateUserDTO userDTO;
     private long timestamp; // Thời gian tạo OTP
+    private String type;
 
-    public OtpVerificationRequest(String otpID, String otp, String email, ResCreateUserDTO userDTO, long timestamp) {
+    public OtpVerificationRequest(String otpID, String otp, String email, ResCreateUserDTO userDTO, long timestamp, String type) {
         this.otpID = otpID;
         this.email = email;
         this.otp = otp;
         this.userDTO = userDTO;
         this.timestamp = timestamp;
+        this.type = type;
     }
 }

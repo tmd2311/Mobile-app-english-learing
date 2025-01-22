@@ -1,8 +1,8 @@
 package utc.englishlearning.Encybara.service;
 
 import org.springframework.stereotype.Service;
-import utc.englishlearning.Encybara.domain.request.OtpVerificationRequest;
-import utc.englishlearning.Encybara.domain.response.ResCreateUserDTO;
+import utc.englishlearning.Encybara.domain.auth.request.OtpVerificationRequest;
+import utc.englishlearning.Encybara.domain.auth.reponse.ResCreateUserDTO;
 
 import java.util.Map;
 import java.util.UUID;
@@ -24,7 +24,7 @@ public class OtpService {
         String otpID= UUID.randomUUID().toString().replace("-", "").substring(0, 6).toUpperCase();
         long tempTimestamp = System.currentTimeMillis();
 
-        OtpVerificationRequest otpData= new OtpVerificationRequest(otpID, otp, email, registerDTO, tempTimestamp);
+        OtpVerificationRequest otpData= new OtpVerificationRequest(otpID, otp, email, registerDTO, tempTimestamp, "register");
         otpStorage.put(otpID, otpData);
         return otpID;
     }

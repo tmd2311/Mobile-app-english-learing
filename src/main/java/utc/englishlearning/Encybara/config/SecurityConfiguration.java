@@ -48,6 +48,7 @@ public class SecurityConfiguration {
                 "/storage/**",
                 "/api/v1/email/**",
                 "/v3/api-docs/**",
+                "/api/v1/otp/**",
                 "/swagger-ui/**",
                 "/swagger-ui.html",
                 "api/v1/auth/verify-otp", "/api/v1/auth/resend-otp",

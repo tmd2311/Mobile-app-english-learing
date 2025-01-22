@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.util.Base64;
 
-import utc.englishlearning.Encybara.domain.response.ResLoginDTO;
+import utc.englishlearning.Encybara.domain.auth.reponse.ResLoginDTO;
 
 @Service
 public class SecurityUtil {

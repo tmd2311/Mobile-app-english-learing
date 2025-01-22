@@ -1,4 +1,4 @@
-package utc.englishlearning.Encybara.domain.response;
+package utc.englishlearning.Encybara.domain.auth.reponse;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package utc.englishlearning.Encybara.domain.request;
+package utc.englishlearning.Encybara.domain.auth.request;
 
 import lombok.Getter;
 import lombok.Setter;
