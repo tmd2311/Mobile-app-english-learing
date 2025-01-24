@@ -3,6 +3,7 @@ package utc.englishlearning.Encybara.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import utc.englishlearning.Encybara.domain.Question;
 import utc.englishlearning.Encybara.domain.Question_Choice;
@@ -12,6 +13,8 @@ import utc.englishlearning.Encybara.domain.response.question.ResQuestionDTO;
 import utc.englishlearning.Encybara.exception.ResourceNotFoundException;
 import utc.englishlearning.Encybara.repository.QuestionRepository;
 import utc.englishlearning.Encybara.repository.QuestionChoiceRepository;
+import utc.englishlearning.Encybara.specification.QuestionSpecification;
+import utc.englishlearning.Encybara.util.constant.QuestionTypeEnum;
 
 import java.util.List;
 
@@ -70,8 +73,14 @@ public class QuestionService {
         return convertToDTO(question);
     }
 
-    public Page<ResQuestionDTO> getAllQuestions(Pageable pageable) {
-        return questionRepository.findAll(pageable).map(this::convertToDTO);
+    public Page<ResQuestionDTO> getAllQuestions(Pageable pageable, String keyword, String content,
+            QuestionTypeEnum quesType, Integer point) {
+        Specification<Question> spec = Specification.where(QuestionSpecification.hasKeyword(keyword))
+                .and(QuestionSpecification.hasQuesContent(content))
+                .and(QuestionSpecification.hasQuesType(quesType))
+                .and(QuestionSpecification.hasPoint(point));
+
+        return questionRepository.findAll(spec, pageable).map(this::convertToDTO);
     }
 
     private ResQuestionDTO convertToDTO(Question question) {
