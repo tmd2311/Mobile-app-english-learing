@@ -10,6 +10,7 @@ import utc.englishlearning.Encybara.domain.request.question.ReqUpdateQuestionDTO
 import utc.englishlearning.Encybara.domain.response.question.ResQuestionDTO;
 import utc.englishlearning.Encybara.service.QuestionService;
 import utc.englishlearning.Encybara.domain.response.RestResponse;
+import utc.englishlearning.Encybara.util.constant.QuestionTypeEnum;
 
 @RestController
 @RequestMapping("/api/v1/questions")
@@ -48,7 +49,7 @@ public class QuestionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RestResponse<ResQuestionDTO>> getQuestionById(@PathVariable Long id) {
+    public ResponseEntity<RestResponse<ResQuestionDTO>> getQuestionById(@PathVariable("id") Long id) {
         ResQuestionDTO question = questionService.getQuestionById(id);
         RestResponse<ResQuestionDTO> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -58,8 +59,13 @@ public class QuestionController {
     }
 
     @GetMapping
-    public ResponseEntity<RestResponse<Page<ResQuestionDTO>>> getAllQuestions(Pageable pageable) {
-        Page<ResQuestionDTO> questions = questionService.getAllQuestions(pageable);
+    public ResponseEntity<RestResponse<Page<ResQuestionDTO>>> getAllQuestions(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "content", required = false) String content,
+            @RequestParam(value = "quesType", required = false) QuestionTypeEnum quesType,
+            @RequestParam(value = "point", required = false) Integer point,
+            Pageable pageable) {
+        Page<ResQuestionDTO> questions = questionService.getAllQuestions(pageable, keyword, content, quesType, point);
         RestResponse<Page<ResQuestionDTO>> response = new RestResponse<>();
         response.setStatusCode(200);
         response.setMessage("Questions retrieved successfully");
