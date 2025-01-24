@@ -78,6 +78,44 @@ public class LessonResultService {
         return resDto;
     }
 
+    public ResLessonResultDTO createLessonResultWithUserId(ReqCreateLessonResultDTO reqDto, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Lesson lesson = lessonRepository.findById(reqDto.getLessonId())
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
+
+        List<Question> questions = questionRepository.findByLesson(lesson);
+
+        List<Answer> answers = answerRepository.findByUserAndQuestionInAndSessionId(user, questions,
+                reqDto.getSessionId());
+        int totalPointsAchieved = answers.stream().mapToInt(Answer::getPoint_achieved).sum();
+
+        int totalPointsPossible = questionRepository.findByLesson(lesson)
+                .stream().mapToInt(Question::getPoint).sum();
+
+        double comLevel = totalPointsPossible > 0 ? (double) totalPointsAchieved / totalPointsPossible * 100 : 0;
+
+        Lesson_Result lessonResult = new Lesson_Result();
+        lessonResult.setLesson(lesson);
+        lessonResult.setUser(user);
+        lessonResult.setSessionId(reqDto.getSessionId());
+        lessonResult.setStuTime(reqDto.getStuTime());
+        lessonResult.setTotalPoints(totalPointsAchieved);
+        lessonResultRepository.save(lessonResult);
+
+        ResLessonResultDTO resDto = new ResLessonResultDTO();
+        resDto.setId(lessonResult.getId());
+        resDto.setLessonId(lesson.getId());
+        resDto.setUserId(user.getId());
+        resDto.setSessionId(reqDto.getSessionId());
+        resDto.setStuTime(reqDto.getStuTime());
+        resDto.setPoint(totalPointsAchieved);
+        resDto.setComLevel(comLevel);
+
+        return resDto;
+    }
+
     public Page<Lesson_Result> getResultsByLessonId(Long lessonId, Pageable pageable) {
         return lessonResultRepository.findByLessonId(lessonId, pageable);
     }
