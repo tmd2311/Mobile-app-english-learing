@@ -1,4 +1,4 @@
-package utc.englishlearning.Encybara.domain.auth.request;
+package utc.englishlearning.Encybara.domain.request.auth;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UpdatePasswordRequest {
-    String resetToken;
+//    String resetToken;
     String newPassword;
     String confirmPassword;
 

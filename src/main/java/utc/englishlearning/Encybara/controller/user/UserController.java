@@ -18,7 +18,7 @@ import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import utc.englishlearning.Encybara.domain.User;
-import utc.englishlearning.Encybara.domain.auth.reponse.ResCreateUserDTO;
+import utc.englishlearning.Encybara.domain.response.auth.ResCreateUserDTO;
 import utc.englishlearning.Encybara.domain.response.ResUpdateUserDTO;
 import utc.englishlearning.Encybara.domain.response.ResUserDTO;
 import utc.englishlearning.Encybara.domain.response.ResultPaginationDTO;

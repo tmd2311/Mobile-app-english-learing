@@ -1,8 +1,8 @@
-package utc.englishlearning.Encybara.domain.auth.request;
+package utc.englishlearning.Encybara.domain.request.auth;
 
 import lombok.Getter;
 import lombok.Setter;
-import utc.englishlearning.Encybara.domain.auth.reponse.ResCreateUserDTO;
+import utc.englishlearning.Encybara.domain.response.auth.ResCreateUserDTO;
 
 @Getter
 @Setter

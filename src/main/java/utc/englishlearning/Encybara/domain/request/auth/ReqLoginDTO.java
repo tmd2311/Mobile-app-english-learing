@@ -1,4 +1,4 @@
-package utc.englishlearning.Encybara.domain.auth.request;
+package utc.englishlearning.Encybara.domain.request.auth;
 
 import jakarta.validation.constraints.NotBlank;
 

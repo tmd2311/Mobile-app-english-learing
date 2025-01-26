@@ -3,6 +3,7 @@ package utc.englishlearning.Encybara.controller.auth;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,12 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import utc.englishlearning.Encybara.domain.RestResponse;
 import utc.englishlearning.Encybara.domain.User;
-import utc.englishlearning.Encybara.domain.auth.reponse.RegisterReponseDTO;
-import utc.englishlearning.Encybara.domain.auth.request.ReqLoginDTO;
-import utc.englishlearning.Encybara.domain.auth.reponse.ResLoginDTO;
+import utc.englishlearning.Encybara.domain.response.auth.RegisterReponseDTO;
+import utc.englishlearning.Encybara.domain.request.auth.ReqLoginDTO;
+import utc.englishlearning.Encybara.domain.response.auth.ResLoginDTO;
 import utc.englishlearning.Encybara.exception.IdInvalidException;
-import utc.englishlearning.Encybara.domain.auth.reponse.ResCreateUserDTO;
+import utc.englishlearning.Encybara.domain.response.auth.ResCreateUserDTO;
 import utc.englishlearning.Encybara.service.EmailService;
 import utc.englishlearning.Encybara.service.OtpService;
 import utc.englishlearning.Encybara.service.UserService;
@@ -86,7 +88,6 @@ public class AuthController {
                                 .path("/")
                                 .maxAge(refreshTokenExpiration)
                                 .build();
-
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE, resCookies.toString())
                                 .body(res);
@@ -147,72 +148,31 @@ public class AuthController {
         @PostMapping("/register")
         public ResponseEntity<?> register(@Valid @RequestBody ResCreateUserDTO resCreateUserDto) {
                 // Kiểm tra xem email đã tồn tại chưa
-                 if (userService.isEmailExist(resCreateUserDto.getEmail())) {
-                 return ResponseEntity.badRequest().body("Email already exists");
-                 }
+                if (userService.isEmailExist(resCreateUserDto.getEmail())) {
+                        RestResponse<ResCreateUserDTO> errorResponse = new RestResponse<>();
+                        errorResponse.setStatusCode(HttpStatus.BAD_REQUEST.value());
+                        errorResponse.setMessage("Email already exists");
+                        return ResponseEntity.badRequest().body(errorResponse);
+                }
+
+                // Tạo OTP
                 String otp = otpService.generateOtp(resCreateUserDto.getEmail());
 
-                // off dong nay test api cho nhanh
+                // Gửi email OTP (bạn có thể bỏ dòng này khi test API)
                 emailService.sendEmailFromTemplateSync(resCreateUserDto.getEmail(), "Your OTP Code", otp);
 
-                String otpID = otpService.saveRegisterData(resCreateUserDto.getEmail(), resCreateUserDto, otp);
-                RegisterReponseDTO registerReponseDTO = new RegisterReponseDTO(
-                                "OTP sent to your email. Please verify to complete registration.",
-                                otpID,
-                                "Expires in 5 minutes");
-                return ResponseEntity.ok(registerReponseDTO);
+                // Lưu thông tin đăng ký
+                String otpID = otpService.saveRegisterData(resCreateUserDto.getEmail(), resCreateUserDto, otp, "register");
+                // Tạo phản hồi
+
+                RestResponse<RegisterReponseDTO> response = new RestResponse<>();
+                response.setStatusCode(HttpStatus.OK.value());
+                response.setMessage("OTP sent to your email. Please verify to complete registration.");
+                response.setData(new RegisterReponseDTO(otpID, "Expires in 2 minutes"));
+
+
+                return ResponseEntity.ok(response);
         }
 
-        // API gửi lại otp dựa vào id
-        // {
-        // "otpID": "B758E8"
-        // }
-//        @PostMapping("/resend-otp")
-//        public ResponseEntity<RegisterReponseDTO> resendOTP(
-//                        @Valid @RequestBody OtpVerificationRequest otpVerificationRequest) {
-//                String otpID = otpVerificationRequest.getOtpID();
-//
-//                OtpVerificationRequest temp = otpService.getOtpData(otpID);
-//                String email = temp.getEmail();
-//                String newOTP = otpService.generateOtp(email);
-//                otpService.updateOtp(otpID, newOTP);
-//
-//                // Gui email lại
-//                emailService.sendEmailFromTemplateSync(temp.getUserDTO().getEmail(), "Your OTP Code", newOTP);
-//                RegisterReponseDTO registerReponseDTO = new RegisterReponseDTO(
-//                                "A new OTP has been sent to your email. Please verify to complete registration.",
-//                                otpID,
-//                                "Expires in 5 minutes");
-//                return ResponseEntity.ok(registerReponseDTO);
-//
-//        }
 
-        // Xác thực OTP ở đây
-//        @PostMapping("/verify-otp")
-//        public ResponseEntity<ErrorResponseDTO> verifyOtp(@Valid @RequestBody OtpVerificationRequest otpRequest) {
-//
-//                // check thong tin
-//                if (!otpService.validateOtp(otpRequest.getOtpID(), otpRequest.getOtp())) { // ham validate viet nguoc de
-//                                                                                           // xoa nen de y
-//                        return ResponseEntity.badRequest().body(new ErrorResponseDTO("Invalid or expired OTP"));
-//                }
-//                OtpVerificationRequest storedData = otpService.getOtpData(otpRequest.getOtpID());
-//                if (storedData == null) {
-//                        return ResponseEntity.badRequest().body(new ErrorResponseDTO("Registration data not found"));
-//                }
-//                // Lấy thông tin người đăng ký để chuẩn bị lưu vào db
-//                ResCreateUserDTO resCreateUserDTO = storedData.getUserDTO();
-//
-//                // Mã hoa mật khẩu và lưu vào db
-//                String encodedPassword = passwordEncoder.encode(resCreateUserDTO.getPassword());
-//                User user = new User();
-//                user.setName(resCreateUserDTO.getName());
-//                user.setEmail(resCreateUserDTO.getEmail());
-//                user.setPassword(encodedPassword);
-//
-//                // Lưu người dùng vào cơ sở dữ liệu
-//                userService.handleCreateUser(user);
-//                otpService.removeOtpData(otpRequest.getOtpID());
-//                return ResponseEntity.ok(new ErrorResponseDTO("Registration successful"));
-//        }
 }

@@ -7,11 +7,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-import utc.englishlearning.Encybara.domain.auth.reponse.RegisterReponseDTO;
-import utc.englishlearning.Encybara.domain.auth.request.OtpVerificationRequest;
-import utc.englishlearning.Encybara.domain.auth.request.UpdatePasswordRequest;
+import utc.englishlearning.Encybara.domain.RestResponse;
+import utc.englishlearning.Encybara.domain.response.auth.RegisterReponseDTO;
+import utc.englishlearning.Encybara.domain.request.auth.OtpVerificationRequest;
+import utc.englishlearning.Encybara.domain.request.auth.UpdatePasswordRequest;
 import utc.englishlearning.Encybara.domain.request.*;
-import utc.englishlearning.Encybara.domain.auth.reponse.ResCreateUserDTO;
+import utc.englishlearning.Encybara.domain.response.auth.ResCreateUserDTO;
 
 import utc.englishlearning.Encybara.service.EmailService;
 import utc.englishlearning.Encybara.service.OtpService;
@@ -55,42 +56,27 @@ public class ForgotPaswordController {
         emailService.sendEmailFromTemplateSync(email, "Your OTP Code", otp);
 
         // System.out.println(otp);
-        String otpID = otpService.saveRegisterData(email, temp, otp);
-
-        return ResponseEntity.ok(new RegisterReponseDTO(
-                "OTP sent to your email. Please verify to complete registration.",
-                otpID,
-                "Expires in 5 minutes"));
+        String otpID = otpService.saveRegisterData(email, temp, otp, "forgotpassword");
+        RestResponse<RegisterReponseDTO> response = new RestResponse<>();
+        response.setStatusCode(HttpStatus.OK.value());
+        response.setMessage("OTP sent to your email. Please verify to complete reset password.");
+        response.setData(new RegisterReponseDTO(otpID, "Expires in 2 minutes"));
+        return ResponseEntity.ok(response);
     }
 
     // Gui lai otp khi het thoi gian se goi ben resend cua Auth vi id da map voi
     // mail
 
-    @PostMapping("/verify-otp")
-    public ResponseEntity<?> verifyOtp(@Valid @RequestBody OtpVerificationRequest otpRequest) {
-        // check thong tin
-        if (!otpService.validateOtp(otpRequest.getOtpID(), otpRequest.getOtp())) { // ham validate viết ngược để ý !!!
-            return ResponseEntity.badRequest().body(new ErrorResponseDTO("Invalid or expired OTP"));
-        }
-        // OTP hợp lệ thì tạo token (hạn 10 p ) để update mật khẩu
-        try {
-            String email = otpService.getOtpData(otpRequest.getOtpID()).getEmail();
-
-            // tạo token từ email
-            String tokenToResetPassword = securityUtil.creatResetPasswordToken(email);
-            return ResponseEntity.ok(new TokenResponseDTO(tokenToResetPassword));
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ErrorResponseDTO("Error generating token: " + e.getMessage()));
-        }
-    }
-
     @PostMapping("/update-password")
-    public ResponseEntity<?> updatePassword(@RequestBody UpdatePasswordRequest updatePasswordRequest) {
+    public ResponseEntity<?> updatePassword(
+            @RequestHeader("Authorization") String resetToken,
+            @RequestBody UpdatePasswordRequest updatePasswordRequest) {
         try {
+            if (resetToken.startsWith("Bearer ")) {
+                resetToken = resetToken.substring(7);
+            }
             // giải mã token và lấy email
-            Jwt token = securityUtil.checkValidResetPasswordToken(updatePasswordRequest.getResetToken());
+            Jwt token = securityUtil.checkValidResetPasswordToken(resetToken);
             String email = token.getSubject();
 
             // check điều mat khau
@@ -106,7 +92,7 @@ public class ForgotPaswordController {
         } catch (RuntimeException e) {
             // Xử lý lỗi khi token không hợp lệ hoặc hết hạn
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponseDTO("Token invalid or expired: " + e.getMessage()));
+                    .body(new ErrorResponseDTO(e.getMessage()));
         } catch (Exception e) {
             // Xử lý các lỗi khác
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

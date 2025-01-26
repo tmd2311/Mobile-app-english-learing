@@ -8,12 +8,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import utc.englishlearning.Encybara.domain.RestResponse;
 import utc.englishlearning.Encybara.domain.User;
 import utc.englishlearning.Encybara.domain.request.ErrorResponseDTO;
-import utc.englishlearning.Encybara.domain.auth.request.OtpVerificationRequest;
-import utc.englishlearning.Encybara.domain.auth.reponse.RegisterReponseDTO;
-import utc.englishlearning.Encybara.domain.auth.reponse.OtpVerifyResponse;
-import utc.englishlearning.Encybara.domain.auth.reponse.ResCreateUserDTO;
+import utc.englishlearning.Encybara.domain.request.TokenResponseDTO;
+import utc.englishlearning.Encybara.domain.request.auth.OtpVerificationRequest;
+import utc.englishlearning.Encybara.domain.response.auth.RegisterReponseDTO;
+import utc.englishlearning.Encybara.domain.response.auth.OtpVerifyResponse;
+import utc.englishlearning.Encybara.domain.response.auth.ResCreateUserDTO;
 import utc.englishlearning.Encybara.service.EmailService;
 import utc.englishlearning.Encybara.service.OtpService;
 import utc.englishlearning.Encybara.service.UserService;
@@ -43,22 +45,26 @@ public class OTPController {
     // "otpID": "B758E8"
     // }
     @PostMapping("/resend-otp")
-    public ResponseEntity<RegisterReponseDTO> resendOTP(
+    public ResponseEntity<?> resendOTP(
             @Valid @RequestBody OtpVerificationRequest otpVerificationRequest) {
         String otpID = otpVerificationRequest.getOtpID();
 
         OtpVerificationRequest temp = otpService.getOtpData(otpID);
-        String email = temp.getEmail();
-        String newOTP = otpService.generateOtp(email);
-        otpService.updateOtp(otpID, newOTP);
+
+        String resendOTP= otpService.updateOtp(otpID);
+        // kiem tra phong truong hop resend otp tra ve bi null
+        if(resendOTP == null) {
+            return new ResponseEntity<>(new ErrorResponseDTO("OTP update failed"), HttpStatus.BAD_REQUEST);
+        }
 
         // Gui email lại
-        emailService.sendEmailFromTemplateSync(temp.getUserDTO().getEmail(), "Your OTP Code", newOTP);
-        RegisterReponseDTO registerReponseDTO = new RegisterReponseDTO(
-                "A new OTP has been sent to your email. Please verify to complete registration.",
-                otpID,
-                "Expires in 5 minutes");
-        return ResponseEntity.ok(registerReponseDTO);
+        emailService.sendEmailFromTemplateSync(temp.getUserDTO().getEmail(), "Your OTP Code", resendOTP);
+
+        RestResponse<RegisterReponseDTO> response = new RestResponse<>();
+        response.setStatusCode(HttpStatus.OK.value());
+        response.setMessage("A OTP has been sent to your email.");
+        response.setData(new RegisterReponseDTO(otpID, "Expires in 2 minutes"));
+        return ResponseEntity.ok(response);
     }
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOTP(@Valid @RequestBody OtpVerificationRequest otpRequest){
@@ -80,16 +86,21 @@ public class OTPController {
     }
 
     private ResponseEntity<?> handleForgotPassword(OtpVerificationRequest otpRequest) {
-        try{
-            String mail = otpRequest.getEmail();
-
-            // tạo token để reset mật khẩu
-            String restToken = securityUtil.creatResetPasswordToken(mail);
-            otpService.removeOtpData(otpRequest.getOtpID());
-            return ResponseEntity.ok(new OtpVerifyResponse("OTP verified successfully", restToken));
+        // check thong tin
+        if (!otpService.validateOtp(otpRequest.getOtpID(), otpRequest.getOtp())) { // ham validate viết ngược để ý !!!
+            return ResponseEntity.badRequest().body(new ErrorResponseDTO("Invalid or expired OTP"));
         }
-        catch (Exception e){
-            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error generating token: " +e.getMessage());
+        // OTP hợp lệ thì tạo token (hạn 10 p ) để update mật khẩu
+        try {
+            String email = otpService.getOtpData(otpRequest.getOtpID()).getEmail();
+
+            // tạo token từ email
+            String tokenToResetPassword = securityUtil.creatResetPasswordToken(email);
+            return ResponseEntity.ok(new TokenResponseDTO(tokenToResetPassword));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponseDTO("Error generating token: " + e.getMessage()));
         }
     }
     private ResponseEntity<?> handleRegistration(OtpVerificationRequest otpRequest) {
