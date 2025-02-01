@@ -12,9 +12,8 @@ import utc.englishlearning.Encybara.domain.RestResponse;
 import utc.englishlearning.Encybara.domain.User;
 import utc.englishlearning.Encybara.domain.request.ErrorResponseDTO;
 import utc.englishlearning.Encybara.domain.request.TokenResponseDTO;
-import utc.englishlearning.Encybara.domain.request.auth.OtpVerificationRequest;
-import utc.englishlearning.Encybara.domain.response.auth.RegisterReponseDTO;
-import utc.englishlearning.Encybara.domain.response.auth.OtpVerifyResponse;
+import utc.englishlearning.Encybara.domain.request.auth.ReqOtpVerificationDTO;
+import utc.englishlearning.Encybara.domain.response.auth.ResRegisterDTO;
 import utc.englishlearning.Encybara.domain.response.auth.ResCreateUserDTO;
 import utc.englishlearning.Encybara.service.EmailService;
 import utc.englishlearning.Encybara.service.OtpService;
@@ -46,10 +45,10 @@ public class OTPController {
     // }
     @PostMapping("/resend-otp")
     public ResponseEntity<?> resendOTP(
-            @Valid @RequestBody OtpVerificationRequest otpVerificationRequest) {
+            @Valid @RequestBody ReqOtpVerificationDTO otpVerificationRequest) {
         String otpID = otpVerificationRequest.getOtpID();
 
-        OtpVerificationRequest temp = otpService.getOtpData(otpID);
+        ReqOtpVerificationDTO temp = otpService.getOtpData(otpID);
 
         String resendOTP= otpService.updateOtp(otpID);
         // kiem tra phong truong hop resend otp tra ve bi null
@@ -60,18 +59,18 @@ public class OTPController {
         // Gui email lại
         emailService.sendEmailFromTemplateSync(temp.getUserDTO().getEmail(), "Your OTP Code", resendOTP);
 
-        RestResponse<RegisterReponseDTO> response = new RestResponse<>();
+        RestResponse<ResRegisterDTO> response = new RestResponse<>();
         response.setStatusCode(HttpStatus.OK.value());
         response.setMessage("A OTP has been sent to your email.");
-        response.setData(new RegisterReponseDTO(otpID, "Expires in 2 minutes"));
+        response.setData(new ResRegisterDTO(otpID, "Expires in 2 minutes"));
         return ResponseEntity.ok(response);
     }
     @PostMapping("/verify-otp")
-    public ResponseEntity<?> verifyOTP(@Valid @RequestBody OtpVerificationRequest otpRequest){
+    public ResponseEntity<?> verifyOTP(@Valid @RequestBody ReqOtpVerificationDTO otpRequest){
         if(!otpService.validateOtp(otpRequest.getOtpID(), otpRequest.getOtp())){
             return ResponseEntity.badRequest().body("Invalid or expired OTP");
         }
-        OtpVerificationRequest storedData = otpService.getOtpData(otpRequest.getOtpID());
+        ReqOtpVerificationDTO storedData = otpService.getOtpData(otpRequest.getOtpID());
         if(storedData == null){
             return ResponseEntity.badRequest().body("Data not found");
         }
@@ -85,7 +84,7 @@ public class OTPController {
         }
     }
 
-    private ResponseEntity<?> handleForgotPassword(OtpVerificationRequest otpRequest) {
+    private ResponseEntity<?> handleForgotPassword(ReqOtpVerificationDTO otpRequest) {
         // check thong tin
         if (!otpService.validateOtp(otpRequest.getOtpID(), otpRequest.getOtp())) { // ham validate viết ngược để ý !!!
             return ResponseEntity.badRequest().body(new ErrorResponseDTO("Invalid or expired OTP"));
@@ -103,13 +102,13 @@ public class OTPController {
                     .body(new ErrorResponseDTO("Error generating token: " + e.getMessage()));
         }
     }
-    private ResponseEntity<?> handleRegistration(OtpVerificationRequest otpRequest) {
+    private ResponseEntity<?> handleRegistration(ReqOtpVerificationDTO otpRequest) {
         try {
             if (!otpService.validateOtp(otpRequest.getOtpID(), otpRequest.getOtp())) { // ham validate viet nguoc de xoa nen de y
                 return ResponseEntity.badRequest().body(new ErrorResponseDTO("Invalid or expired OTP"));
             }
 
-            OtpVerificationRequest storedData = otpService.getOtpData(otpRequest.getOtpID());
+            ReqOtpVerificationDTO storedData = otpService.getOtpData(otpRequest.getOtpID());
             if (storedData == null) {
                 return ResponseEntity.badRequest().body(new ErrorResponseDTO("Registration data not found"));
             }

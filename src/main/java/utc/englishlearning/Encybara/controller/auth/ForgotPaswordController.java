@@ -1,6 +1,5 @@
 package utc.englishlearning.Encybara.controller.auth;
 
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -8,9 +7,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import utc.englishlearning.Encybara.domain.RestResponse;
-import utc.englishlearning.Encybara.domain.response.auth.RegisterReponseDTO;
-import utc.englishlearning.Encybara.domain.request.auth.OtpVerificationRequest;
-import utc.englishlearning.Encybara.domain.request.auth.UpdatePasswordRequest;
+import utc.englishlearning.Encybara.domain.response.auth.ResRegisterDTO;
+import utc.englishlearning.Encybara.domain.request.auth.ReqUpdatePasswordDTO;
 import utc.englishlearning.Encybara.domain.request.*;
 import utc.englishlearning.Encybara.domain.response.auth.ResCreateUserDTO;
 
@@ -57,10 +55,10 @@ public class ForgotPaswordController {
 
         // System.out.println(otp);
         String otpID = otpService.saveRegisterData(email, temp, otp, "forgotpassword");
-        RestResponse<RegisterReponseDTO> response = new RestResponse<>();
+        RestResponse<ResRegisterDTO> response = new RestResponse<>();
         response.setStatusCode(HttpStatus.OK.value());
         response.setMessage("OTP sent to your email. Please verify to complete reset password.");
-        response.setData(new RegisterReponseDTO(otpID, "Expires in 2 minutes"));
+        response.setData(new ResRegisterDTO(otpID, "Expires in 2 minutes"));
         return ResponseEntity.ok(response);
     }
 
@@ -70,7 +68,7 @@ public class ForgotPaswordController {
     @PostMapping("/update-password")
     public ResponseEntity<?> updatePassword(
             @RequestHeader("Authorization") String resetToken,
-            @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+            @RequestBody ReqUpdatePasswordDTO updatePasswordRequest) {
         try {
             if (resetToken.startsWith("Bearer ")) {
                 resetToken = resetToken.substring(7);

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import utc.englishlearning.Encybara.domain.RestResponse;
 import utc.englishlearning.Encybara.domain.User;
-import utc.englishlearning.Encybara.domain.response.auth.RegisterReponseDTO;
+import utc.englishlearning.Encybara.domain.response.auth.ResRegisterDTO;
 import utc.englishlearning.Encybara.domain.request.auth.ReqLoginDTO;
 import utc.englishlearning.Encybara.domain.response.auth.ResLoginDTO;
 import utc.englishlearning.Encybara.exception.IdInvalidException;
@@ -165,10 +165,10 @@ public class AuthController {
                 String otpID = otpService.saveRegisterData(resCreateUserDto.getEmail(), resCreateUserDto, otp, "register");
                 // Tạo phản hồi
 
-                RestResponse<RegisterReponseDTO> response = new RestResponse<>();
+                RestResponse<ResRegisterDTO> response = new RestResponse<>();
                 response.setStatusCode(HttpStatus.OK.value());
                 response.setMessage("OTP sent to your email. Please verify to complete registration.");
-                response.setData(new RegisterReponseDTO(otpID, "Expires in 2 minutes"));
+                response.setData(new ResRegisterDTO(otpID, "Expires in 2 minutes"));
 
 
                 return ResponseEntity.ok(response);

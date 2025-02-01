@@ -6,7 +6,7 @@ import utc.englishlearning.Encybara.domain.response.auth.ResCreateUserDTO;
 
 @Getter
 @Setter
-public class OtpVerificationRequest {
+public class ReqOtpVerificationDTO {
     private  String otpID;
     private String email;
     private String otp;
@@ -14,7 +14,7 @@ public class OtpVerificationRequest {
     private long timestamp; // Thời gian tạo OTP
     private String type;
 
-    public OtpVerificationRequest(String otpID, String otp, String email, ResCreateUserDTO userDTO, long timestamp, String type) {
+    public ReqOtpVerificationDTO(String otpID, String otp, String email, ResCreateUserDTO userDTO, long timestamp, String type) {
         this.otpID = otpID;
         this.email = email;
         this.otp = otp;

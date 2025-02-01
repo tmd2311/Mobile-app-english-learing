@@ -1,7 +1,7 @@
 package utc.englishlearning.Encybara.service;
 
 import org.springframework.stereotype.Service;
-import utc.englishlearning.Encybara.domain.request.auth.OtpVerificationRequest;
+import utc.englishlearning.Encybara.domain.request.auth.ReqOtpVerificationDTO;
 import utc.englishlearning.Encybara.domain.response.auth.ResCreateUserDTO;
 
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class OtpService {
-    private final Map<String, OtpVerificationRequest> otpStorage = new ConcurrentHashMap<>();
+    private final Map<String, ReqOtpVerificationDTO> otpStorage = new ConcurrentHashMap<>();
     private static final long OTP_EXPIRATION_TIME = 2 * 60 * 1000; // 1 phút
 
     public String generateOtp(String email) {
@@ -24,13 +24,13 @@ public class OtpService {
         String otpID= UUID.randomUUID().toString().replace("-", "").substring(0, 6).toUpperCase();
         long tempTimestamp = System.currentTimeMillis();
 
-        OtpVerificationRequest otpData= new OtpVerificationRequest(otpID, otp, email, registerDTO, tempTimestamp, type);
+        ReqOtpVerificationDTO otpData= new ReqOtpVerificationDTO(otpID, otp, email, registerDTO, tempTimestamp, type);
         otpStorage.put(otpID, otpData);
         return otpID;
     }
 
     public String updateOtp(String otpID){
-        OtpVerificationRequest otpData = otpStorage.get(otpID);
+        ReqOtpVerificationDTO otpData = otpStorage.get(otpID);
         if(otpData != null){
             otpData.setTimestamp(System.currentTimeMillis());
             if(System.currentTimeMillis()- otpData.getTimestamp()<= OTP_EXPIRATION_TIME){
@@ -42,8 +42,8 @@ public class OtpService {
         return null;
     }
 
-    public OtpVerificationRequest getOtpData(String otpID) {
-        OtpVerificationRequest otpData = otpStorage.get(otpID);
+    public ReqOtpVerificationDTO getOtpData(String otpID) {
+        ReqOtpVerificationDTO otpData = otpStorage.get(otpID);
         if(otpData == null) {
             return null;
         }
@@ -59,7 +59,7 @@ public class OtpService {
     //    // Xác thực OTP
     public boolean validateOtp(String otpID, String otp) {
 
-        OtpVerificationRequest otpData = getOtpData(otpID);
+        ReqOtpVerificationDTO otpData = getOtpData(otpID);
         System.out.println(otp+"  " + otpData.getOtp());
         if( !otpData.getOtp().equals(otp)) {
             return false; // otpData rỗng hoặc otp không đúng
@@ -67,7 +67,7 @@ public class OtpService {
         return true;
     }
 
-    public OtpVerificationRequest removeOtpData(String otpID) {
+    public ReqOtpVerificationDTO removeOtpData(String otpID) {
         return otpStorage.remove(otpID);
     }
 }

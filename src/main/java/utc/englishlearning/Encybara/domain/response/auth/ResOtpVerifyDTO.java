@@ -5,11 +5,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class OtpVerifyResponse {
+public class ResOtpVerifyDTO {
     private String message;
     private String token; // Chỉ sử dụng nếu type là "forgotPassword"
 
-    public OtpVerifyResponse(String message, String token) {
+    public ResOtpVerifyDTO(String message, String token) {
         this.message = message;
         this.token = token;
     }

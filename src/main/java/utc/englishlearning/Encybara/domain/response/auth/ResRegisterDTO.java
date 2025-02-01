@@ -5,11 +5,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RegisterReponseDTO {
+public class ResRegisterDTO {
     private String otpID;
     private String timestamp;
 
-    public RegisterReponseDTO(String otpID, String timestamp) {
+    public ResRegisterDTO(String otpID, String timestamp) {
         this.timestamp = timestamp;
         this.otpID = otpID;
     }
