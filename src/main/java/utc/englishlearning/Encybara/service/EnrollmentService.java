@@ -10,6 +10,8 @@ import utc.englishlearning.Encybara.exception.ResourceNotFoundException;
 import utc.englishlearning.Encybara.repository.EnrollmentRepository;
 import utc.englishlearning.Encybara.repository.CourseRepository;
 import utc.englishlearning.Encybara.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
 
@@ -53,6 +55,16 @@ public class EnrollmentService {
         Enrollment enrollment = enrollmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found"));
         enrollmentRepository.delete(enrollment);
+    }
+
+    public Page<ResEnrollmentDTO> getEnrollmentsByUserId(Long userId, Boolean proStatus, Pageable pageable) {
+        Page<Enrollment> enrollments;
+        if (proStatus != null) {
+            enrollments = enrollmentRepository.findByUserIdAndProStatus(userId, proStatus, pageable);
+        } else {
+            enrollments = enrollmentRepository.findByUserId(userId, pageable);
+        }
+        return enrollments.map(this::convertToDTO);
     }
 
     private ResEnrollmentDTO convertToDTO(Enrollment enrollment) {
