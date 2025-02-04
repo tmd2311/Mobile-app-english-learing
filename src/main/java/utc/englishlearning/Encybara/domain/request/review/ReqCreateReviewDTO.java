@@ -8,7 +8,7 @@ import utc.englishlearning.Encybara.util.constant.ReviewStatusEnum;
 @Setter
 public class ReqCreateReviewDTO {
     private Long userId;
-    private Long lessonId;
+    private Long courseId;
     private String reContent;
     private String reSubject;
     private int numStar;

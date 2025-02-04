@@ -11,7 +11,7 @@ import utc.englishlearning.Encybara.exception.ResourceAlreadyExistsException;
 import utc.englishlearning.Encybara.repository.ReviewRepository;
 import utc.englishlearning.Encybara.repository.UserRepository;
 import utc.englishlearning.Encybara.util.constant.ReviewStatusEnum;
-import utc.englishlearning.Encybara.repository.LessonRepository;
+import utc.englishlearning.Encybara.repository.CourseRepository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,20 +26,20 @@ public class ReviewService {
     private UserRepository userRepository;
 
     @Autowired
-    private LessonRepository lessonRepository;
+    private CourseRepository courseRepository;
 
     @Transactional
     public ResReviewDTO createReview(ReqCreateReviewDTO reqCreateReviewDTO) {
-        if (reviewRepository.existsByUserIdAndLessonId(reqCreateReviewDTO.getUserId(),
-                reqCreateReviewDTO.getLessonId())) {
-            throw new ResourceAlreadyExistsException("User has already reviewed this lesson.");
+        if (reviewRepository.existsByUserIdAndCourseId(reqCreateReviewDTO.getUserId(),
+                reqCreateReviewDTO.getCourseId())) {
+            throw new ResourceAlreadyExistsException("User has already reviewed this course.");
         }
 
         Review review = new Review();
         review.setUser(userRepository.findById(reqCreateReviewDTO.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found")));
-        review.setLesson(lessonRepository.findById(reqCreateReviewDTO.getLessonId())
-                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found")));
+        review.setCourse(courseRepository.findById(reqCreateReviewDTO.getCourseId())
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found")));
         review.setReContent(reqCreateReviewDTO.getReContent());
         review.setReSubject(reqCreateReviewDTO.getReSubject());
         review.setNumStar(reqCreateReviewDTO.getNumStar());
@@ -79,13 +79,13 @@ public class ReviewService {
         reviewRepository.delete(review);
     }
 
-    public Page<ResReviewDTO> getAllReviewsByLessonId(Long lessonId, Pageable pageable, Integer numStar,
+    public Page<ResReviewDTO> getAllReviewsByCourseId(Long courseId, Pageable pageable, Integer numStar,
             ReviewStatusEnum status) {
         Page<Review> reviews;
         if (numStar != null && status != null) {
-            reviews = reviewRepository.findByLessonIdAndNumStarAndStatus(lessonId, numStar, status, pageable);
+            reviews = reviewRepository.findByCourseIdAndNumStarAndStatus(courseId, numStar, status, pageable);
         } else {
-            reviews = reviewRepository.findByLessonId(lessonId, pageable);
+            reviews = reviewRepository.findByCourseId(courseId, pageable);
         }
         return reviews.map(this::convertToDTO);
     }
@@ -98,7 +98,7 @@ public class ReviewService {
         ResReviewDTO dto = new ResReviewDTO();
         dto.setId(review.getId());
         dto.setUserId(review.getUser().getId());
-        dto.setLessonId(review.getLesson().getId());
+        dto.setCourseId(review.getCourse().getId());
         dto.setReContent(review.getReContent());
         dto.setReSubject(review.getReSubject());
         dto.setNumStar(review.getNumStar());

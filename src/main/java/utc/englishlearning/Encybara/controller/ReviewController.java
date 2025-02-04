@@ -48,13 +48,13 @@ public class ReviewController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/lesson/{lessonId}")
-    public ResponseEntity<RestResponse<Page<ResReviewDTO>>> getAllReviewsByLessonId(
-            @PathVariable Long lessonId,
+    @GetMapping("/course/{courseId}")
+    public ResponseEntity<RestResponse<Page<ResReviewDTO>>> getAllReviewsByCourseId(
+            @PathVariable Long courseId,
             @RequestParam(required = false) Integer numStar,
             @RequestParam(required = false) ReviewStatusEnum status,
             Pageable pageable) {
-        Page<ResReviewDTO> reviews = reviewService.getAllReviewsByLessonId(lessonId, pageable, numStar, status);
+        Page<ResReviewDTO> reviews = reviewService.getAllReviewsByCourseId(courseId, pageable, numStar, status);
         RestResponse<Page<ResReviewDTO>> response = new RestResponse<>();
         response.setStatusCode(200);
         response.setMessage("Reviews retrieved successfully");

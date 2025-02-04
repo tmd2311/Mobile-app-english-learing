@@ -9,12 +9,12 @@ import utc.englishlearning.Encybara.util.constant.ReviewStatusEnum;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    boolean existsByUserIdAndLessonId(Long userId, Long lessonId);
+    boolean existsByUserIdAndCourseId(Long userId, Long lessonId);
 
-    Page<Review> findByLessonId(Long lessonId, Pageable pageable);
+    Page<Review> findByCourseId(Long lessonId, Pageable pageable);
 
     Page<Review> findByUserId(Long userId, Pageable pageable);
 
-    Page<Review> findByLessonIdAndNumStarAndStatus(Long lessonId, Integer numStar, ReviewStatusEnum status,
+    Page<Review> findByCourseIdAndNumStarAndStatus(Long lessonId, Integer numStar, ReviewStatusEnum status,
             Pageable pageable);
 }

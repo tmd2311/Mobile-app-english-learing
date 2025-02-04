@@ -31,6 +31,6 @@ public class Review {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "lesson_id")
-    private Lesson lesson;
+    @JoinColumn(name = "course_id")
+    private Course course;
 }
