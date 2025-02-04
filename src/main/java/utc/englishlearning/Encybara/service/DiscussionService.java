@@ -100,12 +100,14 @@ public class DiscussionService {
     }
 
     public Page<ResDiscussionDTO> getAllDiscussionsByLessonId(Long lessonId, Pageable pageable) {
-        Page<Discussion> discussions = discussionRepository.findByLessonId(lessonId, pageable);
+        // Lấy tất cả thảo luận cha cho bài học
+        Page<Discussion> discussions = discussionRepository.findByLessonIdAndParentDiscussionIsNull(lessonId, pageable);
         return discussions.map(this::convertToDTO);
     }
 
     public Page<ResDiscussionDTO> getAllDiscussionsByUserId(Long userId, Pageable pageable) {
-        Page<Discussion> discussions = discussionRepository.findByUserId(userId, pageable);
+        // Lấy tất cả thảo luận cha của người dùng
+        Page<Discussion> discussions = discussionRepository.findByUserIdAndParentDiscussionIsNull(userId, pageable);
         return discussions.map(this::convertToDTO);
     }
 
