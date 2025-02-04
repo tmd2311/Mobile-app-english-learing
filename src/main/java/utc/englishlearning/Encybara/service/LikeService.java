@@ -5,9 +5,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import utc.englishlearning.Encybara.domain.Like;
 import utc.englishlearning.Encybara.domain.Review;
+import utc.englishlearning.Encybara.domain.Discussion;
+import utc.englishlearning.Encybara.domain.User;
 import utc.englishlearning.Encybara.exception.ResourceNotFoundException;
 import utc.englishlearning.Encybara.repository.LikeRepository;
 import utc.englishlearning.Encybara.repository.ReviewRepository;
+import utc.englishlearning.Encybara.repository.DiscussionRepository;
 import utc.englishlearning.Encybara.repository.UserRepository;
 
 @Service
@@ -17,10 +20,13 @@ public class LikeService {
     private LikeRepository likeRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private ReviewRepository reviewRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private DiscussionRepository discussionRepository;
 
     @Transactional
     public void likeReview(Long userId, Long reviewId) {
@@ -28,17 +34,15 @@ public class LikeService {
             throw new RuntimeException("User has already liked this review.");
         }
 
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
 
         Like like = new Like();
-        like.setUser(userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found")));
+        like.setUser(user);
         like.setReview(review);
         likeRepository.save(like);
-
-        review.setNumLike(review.getNumLike() + 1);
-        reviewRepository.save(review);
     }
 
     @Transactional
@@ -48,11 +52,31 @@ public class LikeService {
         }
 
         likeRepository.deleteByUserIdAndReviewId(userId, reviewId);
+    }
 
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
+    @Transactional
+    public void likeDiscussion(Long userId, Long discussionId) {
+        if (likeRepository.existsByUserIdAndDiscussionId(userId, discussionId)) {
+            throw new RuntimeException("User has already liked this discussion.");
+        }
 
-        review.setNumLike(review.getNumLike() - 1);
-        reviewRepository.save(review);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        Discussion discussion = discussionRepository.findById(discussionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Discussion not found"));
+
+        Like like = new Like();
+        like.setUser(user);
+        like.setDiscussion(discussion);
+        likeRepository.save(like);
+    }
+
+    @Transactional
+    public void unlikeDiscussion(Long userId, Long discussionId) {
+        if (!likeRepository.existsByUserIdAndDiscussionId(userId, discussionId)) {
+            throw new RuntimeException("User has not liked this discussion.");
+        }
+
+        likeRepository.deleteByUserIdAndDiscussionId(userId, discussionId);
     }
 }

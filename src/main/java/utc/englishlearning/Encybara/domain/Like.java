@@ -18,6 +18,10 @@ public class Like {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "review_id")
+    @JoinColumn(name = "review_id", nullable = true)
     private Review review;
+
+    @ManyToOne
+    @JoinColumn(name = "discussion_id", nullable = true)
+    private Discussion discussion;
 }

@@ -8,5 +8,9 @@ import utc.englishlearning.Encybara.domain.Like;
 public interface LikeRepository extends JpaRepository<Like, Long> {
     boolean existsByUserIdAndReviewId(Long userId, Long reviewId);
 
+    boolean existsByUserIdAndDiscussionId(Long userId, Long discussionId);
+
     void deleteByUserIdAndReviewId(Long userId, Long reviewId);
+
+    void deleteByUserIdAndDiscussionId(Long userId, Long discussionId);
 }
