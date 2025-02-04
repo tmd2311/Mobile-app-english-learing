@@ -1,14 +1,14 @@
 package utc.englishlearning.Encybara.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utc.englishlearning.Encybara.domain.request.discussion.ReqCreateDiscussionDTO;
 import utc.englishlearning.Encybara.domain.response.discussion.ResDiscussionDTO;
 import utc.englishlearning.Encybara.service.DiscussionService;
 import utc.englishlearning.Encybara.domain.response.RestResponse;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/discussions")
@@ -28,11 +28,41 @@ public class DiscussionController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<RestResponse<Void>> deleteDiscussion(@PathVariable Long id) {
+        discussionService.deleteDiscussion(id);
+        RestResponse<Void> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Discussion deleted successfully");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RestResponse<ResDiscussionDTO>> getDiscussionById(@PathVariable Long id) {
+        ResDiscussionDTO discussionDTO = discussionService.getDiscussionById(id);
+        RestResponse<ResDiscussionDTO> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Discussion retrieved successfully");
+        response.setData(discussionDTO);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<RestResponse<Page<ResDiscussionDTO>>> getAllDiscussionsByUserId(
+            @PathVariable Long userId, Pageable pageable) {
+        Page<ResDiscussionDTO> discussions = discussionService.getAllDiscussionsByUserId(userId, pageable);
+        RestResponse<Page<ResDiscussionDTO>> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Discussions retrieved successfully");
+        response.setData(discussions);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/lesson/{lessonId}")
-    public ResponseEntity<RestResponse<List<ResDiscussionDTO>>> getAllDiscussionsByLessonId(
-            @PathVariable Long lessonId) {
-        List<ResDiscussionDTO> discussions = discussionService.getAllDiscussionsByLessonId(lessonId);
-        RestResponse<List<ResDiscussionDTO>> response = new RestResponse<>();
+    public ResponseEntity<RestResponse<Page<ResDiscussionDTO>>> getAllDiscussionsByLessonId(
+            @PathVariable Long lessonId, Pageable pageable) {
+        Page<ResDiscussionDTO> discussions = discussionService.getAllDiscussionsByLessonId(lessonId, pageable);
+        RestResponse<Page<ResDiscussionDTO>> response = new RestResponse<>();
         response.setStatusCode(200);
         response.setMessage("Discussions retrieved successfully");
         response.setData(discussions);
