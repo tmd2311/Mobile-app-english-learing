@@ -7,6 +7,7 @@ import utc.englishlearning.Encybara.domain.Discussion;
 import utc.englishlearning.Encybara.domain.request.discussion.ReqCreateDiscussionDTO;
 import utc.englishlearning.Encybara.domain.response.discussion.ResDiscussionDTO;
 import utc.englishlearning.Encybara.exception.ResourceNotFoundException;
+import utc.englishlearning.Encybara.exception.InvalidOperationException;
 import utc.englishlearning.Encybara.repository.DiscussionRepository;
 import utc.englishlearning.Encybara.repository.LessonRepository;
 import utc.englishlearning.Encybara.repository.UserRepository;
@@ -38,6 +39,19 @@ public class DiscussionService {
         if (reqCreateDiscussionDTO.getParentId() != null) {
             Discussion parentDiscussion = discussionRepository.findById(reqCreateDiscussionDTO.getParentId())
                     .orElseThrow(() -> new ResourceNotFoundException("Parent discussion not found"));
+
+            List<Discussion> replies = discussionRepository.findByParentDiscussionId(parentDiscussion.getId());
+            if (!replies.isEmpty()) {
+                throw new InvalidOperationException("Parent discussion already has replies.");
+            }
+
+            for (Discussion reply : replies) {
+                List<Discussion> subReplies = discussionRepository.findByParentDiscussionId(reply.getId());
+                if (!subReplies.isEmpty()) {
+                    throw new InvalidOperationException("Replies cannot have their own replies.");
+                }
+            }
+
             discussion.setParentDiscussion(parentDiscussion);
         }
 

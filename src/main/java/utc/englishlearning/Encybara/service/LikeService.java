@@ -43,6 +43,10 @@ public class LikeService {
         like.setUser(user);
         like.setReview(review);
         likeRepository.save(like);
+
+        // Tăng số lượng like cho review
+        review.setNumLike(review.getNumLike() + 1);
+        reviewRepository.save(review);
     }
 
     @Transactional
@@ -52,6 +56,12 @@ public class LikeService {
         }
 
         likeRepository.deleteByUserIdAndReviewId(userId, reviewId);
+
+        // Giảm số lượng like cho review
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
+        review.setNumLike(review.getNumLike() - 1);
+        reviewRepository.save(review);
     }
 
     @Transactional
@@ -69,6 +79,10 @@ public class LikeService {
         like.setUser(user);
         like.setDiscussion(discussion);
         likeRepository.save(like);
+
+        // Tăng số lượng like cho discussion
+        discussion.setNumLike(discussion.getNumLike() + 1);
+        discussionRepository.save(discussion);
     }
 
     @Transactional
@@ -78,5 +92,11 @@ public class LikeService {
         }
 
         likeRepository.deleteByUserIdAndDiscussionId(userId, discussionId);
+
+        // Giảm số lượng like cho discussion
+        Discussion discussion = discussionRepository.findById(discussionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Discussion not found"));
+        discussion.setNumLike(discussion.getNumLike() - 1);
+        discussionRepository.save(discussion);
     }
 }

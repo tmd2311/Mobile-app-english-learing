@@ -14,7 +14,8 @@ public class LikeController {
     private LikeService likeService;
 
     @PostMapping("/review")
-    public ResponseEntity<RestResponse<Void>> likeReview(@RequestParam Long userId, @RequestParam Long reviewId) {
+    public ResponseEntity<RestResponse<Void>> likeReview(@RequestParam Long userId,
+            @RequestParam Long reviewId) {
         likeService.likeReview(userId, reviewId);
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -23,7 +24,8 @@ public class LikeController {
     }
 
     @DeleteMapping("/review")
-    public ResponseEntity<RestResponse<Void>> unlikeReview(@RequestParam Long userId, @RequestParam Long reviewId) {
+    public ResponseEntity<RestResponse<Void>> unlikeReview(@RequestParam Long userId,
+            @RequestParam Long reviewId) {
         likeService.unlikeReview(userId, reviewId);
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(200);
