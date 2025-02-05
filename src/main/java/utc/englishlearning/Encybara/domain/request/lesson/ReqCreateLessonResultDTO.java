@@ -10,4 +10,5 @@ public class ReqCreateLessonResultDTO {
     private Long lessonId;
     private long sessionId;
     private long userId;
+    private long enrollmentId;
 }
