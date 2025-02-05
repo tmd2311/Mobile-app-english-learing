@@ -62,13 +62,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceAlreadyExistsException.class)
-    public ResponseEntity<RestResponse<Object>> handleResourceAlreadyExistsException(
-            ResourceAlreadyExistsException ex) {
-        RestResponse<Object> res = new RestResponse<>();
-        res.setStatusCode(HttpStatus.CONFLICT.value());
-        res.setError("Resource already exists");
-        res.setMessage(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(res);
+    public ResponseEntity<RestResponse<String>> handleResourceAlreadyExistsException(ResourceAlreadyExistsException e) {
+        RestResponse<String> response = new RestResponse<>();
+        response.setStatusCode(HttpStatus.CONFLICT.value());
+        response.setMessage(e.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(InvalidOperationException.class)

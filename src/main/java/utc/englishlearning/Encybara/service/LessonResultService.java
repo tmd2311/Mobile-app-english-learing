@@ -22,6 +22,7 @@ import utc.englishlearning.Encybara.repository.EnrollmentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import utc.englishlearning.Encybara.util.SecurityUtil;
+import utc.englishlearning.Encybara.exception.ResourceAlreadyExistsException;
 
 import java.util.List;
 
@@ -94,6 +95,13 @@ public class LessonResultService {
 
                 Lesson lesson = lessonRepository.findById(reqDto.getLessonId())
                                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
+
+                // Kiểm tra xem Lesson_Result đã tồn tại chưa
+                if (lessonResultRepository.existsByUserIdAndLessonIdAndSessionIdAndEnrollmentId(
+                                userId, reqDto.getLessonId(), reqDto.getSessionId(), reqDto.getEnrollmentId())) {
+                        throw new ResourceAlreadyExistsException(
+                                        "Lesson result already exists for this user, lesson, session, and enrollment.");
+                }
 
                 List<Question> questions = questionRepository.findByLesson(lesson);
 
