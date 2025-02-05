@@ -12,7 +12,6 @@ import utc.englishlearning.Encybara.util.constant.QuestionTypeEnum;
 import utc.englishlearning.Encybara.util.constant.SkillTypeEnum;
 import utc.englishlearning.Encybara.util.SecurityUtil;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.FetchType;
@@ -67,7 +66,4 @@ public class Question {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Question_Choice> questionChoices;
-
-    @OneToOne(mappedBy = "question", fetch = FetchType.LAZY)
-    private Learning_Material learningMaterial;
 }
