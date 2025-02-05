@@ -18,14 +18,17 @@ import java.time.Instant;
 public class Enrollment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id; 
+    private long id;
     private Instant errolDate;
     private boolean proStatus;
+
+    private int totalPoints; // Điểm tổng của khóa học
+    private double comLevel; // Mức độ hoàn thành khóa học
 
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
-    
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

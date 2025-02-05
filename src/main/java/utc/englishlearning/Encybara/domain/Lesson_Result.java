@@ -20,7 +20,7 @@ public class Lesson_Result {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private long stuTime;
-    private String comLevel;
+    private double comLevel;
 
     private long sessionId;
     private int totalPoints;
@@ -32,4 +32,8 @@ public class Lesson_Result {
     @ManyToOne
     @JoinColumn(name = "lesson_id")
     private Lesson lesson;
+
+    @ManyToOne
+    @JoinColumn(name = "enrollment_id")
+    private Enrollment enrollment;
 }

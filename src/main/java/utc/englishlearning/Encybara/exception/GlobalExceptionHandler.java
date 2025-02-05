@@ -80,10 +80,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<RestResponse<String>> handleGeneralException(Exception ex) {
+    public ResponseEntity<RestResponse<String>> handleException(Exception e) {
         RestResponse<String> response = new RestResponse<>();
         response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        response.setMessage("An error occurred: " + ex.getMessage());
+        response.setMessage(e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }

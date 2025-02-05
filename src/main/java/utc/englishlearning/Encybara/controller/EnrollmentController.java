@@ -10,6 +10,8 @@ import utc.englishlearning.Encybara.domain.response.RestResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestParam;
+import utc.englishlearning.Encybara.domain.request.enrollment.ReqCalculateEnrollmentResultDTO;
+import utc.englishlearning.Encybara.domain.response.enrollment.ResCalculateEnrollmentResultDTO;
 
 @RestController
 @RequestMapping("/api/v1/enrollments")
@@ -57,6 +59,17 @@ public class EnrollmentController {
         response.setStatusCode(200);
         response.setMessage("Enrollments retrieved successfully");
         response.setData(enrollments);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/calculate-result")
+    public ResponseEntity<RestResponse<ResCalculateEnrollmentResultDTO>> calculateEnrollmentResult(
+            @RequestBody ReqCalculateEnrollmentResultDTO reqDto) {
+        ResCalculateEnrollmentResultDTO result = enrollmentService.calculateEnrollmentResult(reqDto);
+        RestResponse<ResCalculateEnrollmentResultDTO> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Enrollment result calculated successfully");
+        response.setData(result);
         return ResponseEntity.ok(response);
     }
 }
