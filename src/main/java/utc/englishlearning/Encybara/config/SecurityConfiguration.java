@@ -58,7 +58,8 @@ public class SecurityConfiguration {
                 "/api/v1/courses/**",
                 "/api/v1/lessons/**",
                 "/api/v1/lesson-results/**",
-                "/api/v1/questions/**"
+                "/api/v1/questions/**",
+                "/api/v1/dictionary/**"
         };
 
         http
