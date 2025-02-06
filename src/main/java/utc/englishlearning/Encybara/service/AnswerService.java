@@ -17,6 +17,7 @@ import utc.englishlearning.Encybara.repository.AnswerTextRepository;
 import utc.englishlearning.Encybara.domain.Question_Choice;
 import utc.englishlearning.Encybara.repository.QuestionChoiceRepository;
 import utc.englishlearning.Encybara.util.SecurityUtil;
+import utc.englishlearning.Encybara.util.constant.QuestionTypeEnum;
 import utc.englishlearning.Encybara.domain.User;
 import utc.englishlearning.Encybara.repository.UserRepository;
 
@@ -59,13 +60,13 @@ public class AnswerService {
                 answer.setUser(user);
                 answer.setPoint_achieved(0);
                 answer.setSessionId(newSessionId); // Thiết lập sessionId tự động
-                answer = answerRepository.save(answer);
 
                 Answer_Text answerText = new Answer_Text();
                 answerText.setAnsContent(reqCreateAnswerDTO.getAnswerContent());
                 answerText.setAnswer(answer);
                 answerTextRepository.save(answerText);
 
+                answer = answerRepository.save(answer);
                 return convertToDTO(answer, answerText);
         }
 
@@ -133,17 +134,33 @@ public class AnswerService {
                 // Get the associated question
                 Question question = answer.getQuestion();
 
-                // Get the correct choices for the question
-                List<Question_Choice> choices = questionChoiceRepository.findByQuestionId(question.getId());
+                // Kiểm tra loại câu hỏi
+                if (question.getQuesType() == QuestionTypeEnum.MULTIPLE) {
+                        // Lấy các lựa chọn đúng cho câu hỏi
+                        List<Question_Choice> choices = questionChoiceRepository.findByQuestionId(question.getId());
+                        // Nối chuỗi các lựa chọn đúng
+                        String correctAnswers = choices.stream()
+                                        .filter(Question_Choice::isChoiceKey)
+                                        .map(Question_Choice::getChoiceContent)
+                                        .collect(Collectors.joining(", "));
 
-                // Check if the answer content matches any correct choice
-                boolean isCorrect = choices.stream()
-                                .anyMatch(choice -> choice.getChoiceContent()
-                                                .equals(answer.getAnswerText().getAnsContent())
-                                                && choice.isChoiceKey());
+                        // So sánh với nội dung câu trả lời
+                        boolean isCorrect = correctAnswers.equals(answer.getAnswerText().getAnsContent());
+                        answer.setPoint_achieved(isCorrect ? question.getPoint() : 0);
+                } else {
+                        // Get the correct choices for the question
+                        List<Question_Choice> choices = questionChoiceRepository.findByQuestionId(question.getId());
 
-                // Update point_achieved based on the result
-                answer.setPoint_achieved(isCorrect ? question.getPoint() : 0);
+                        // Check if the answer content matches any correct choice
+                        boolean isCorrect = choices.stream()
+                                        .anyMatch(choice -> choice.getChoiceContent()
+                                                        .equals(answer.getAnswerText().getAnsContent())
+                                                        && choice.isChoiceKey());
+
+                        // Update point_achieved based on the result
+                        answer.setPoint_achieved(isCorrect ? question.getPoint() : 0);
+                }
+
                 answerRepository.save(answer); // Save the updated answer
         }
 

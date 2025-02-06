@@ -22,4 +22,8 @@ public class Answer_Text {
     @OneToOne
     @JoinColumn(name = "answer_id", nullable = false)
     private Answer answer;
+
+    public void setAnsContent(String[] ansContent) {
+        this.ansContent = String.join(", ", ansContent);
+    }
 }

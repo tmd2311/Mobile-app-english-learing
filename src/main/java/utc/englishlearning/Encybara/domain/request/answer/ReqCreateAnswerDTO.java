@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class ReqCreateAnswerDTO {
     private Long questionId;
-    private String answerContent; // Nội dung câu trả lời
+    private String[] answerContent; // Thay đổi từ String thành String[]
     private long sessionId;
 }
