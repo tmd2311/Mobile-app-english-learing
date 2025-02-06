@@ -1,15 +1,10 @@
 package utc.englishlearning.Encybara.controller.Dictionary;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import utc.englishlearning.Encybara.service.GoogleTranslateService;
-
-import java.util.Dictionary;
+import utc.englishlearning.Encybara.domain.response.RestResponse;
 
 @RestController
 @RequestMapping("/api/v1/dictionary")
@@ -19,11 +14,20 @@ public class GoogleTranslateController {
     public GoogleTranslateController(GoogleTranslateService googleTranslateService) {
         this.googleTranslateService = googleTranslateService;
     }
-    @GetMapping
-    public Mono<String> translateText (
+
+    @GetMapping("/translate")
+    public ResponseEntity<RestResponse<String>> translateText(
             @RequestParam String text,
-            @RequestParam(defaultValue = "vi") String language
-    ){
-        return googleTranslateService.translate(text, language);
+            @RequestParam(defaultValue = "vi") String language) {
+        Mono<String> translatedTextMono = googleTranslateService.translate(text, language);
+
+        // Chuyển đổi Mono<String> thành String
+        String translatedText = translatedTextMono.block(); // Chặn để lấy giá trị
+
+        RestResponse<String> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Translation successful");
+        response.setData(translatedText);
+        return ResponseEntity.ok(response);
     }
 }
