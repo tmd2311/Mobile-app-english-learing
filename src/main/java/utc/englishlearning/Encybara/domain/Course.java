@@ -16,6 +16,7 @@ import utc.englishlearning.Encybara.util.constant.CourseTypeEnum;
 import utc.englishlearning.Encybara.util.constant.SpecialFieldEnum;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -67,4 +68,12 @@ public class Course {
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
     @JsonIgnore
     List<Enrollment> enrollments;
+
+    public List<Lesson> getLessons() {
+        List<Lesson> lessons = new ArrayList<>();
+        for (Course_Lesson courseLesson : courselessons) {
+            lessons.add(courseLesson.getLesson());
+        }
+        return lessons;
+    }
 }

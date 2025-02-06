@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import utc.englishlearning.Encybara.domain.Enrollment;
+import utc.englishlearning.Encybara.domain.Lesson;
 import utc.englishlearning.Encybara.domain.Lesson_Result;
+import utc.englishlearning.Encybara.domain.Question;
 import utc.englishlearning.Encybara.domain.request.enrollment.ReqCreateEnrollmentDTO;
 import utc.englishlearning.Encybara.domain.request.enrollment.ReqCalculateEnrollmentResultDTO;
 import utc.englishlearning.Encybara.domain.response.enrollment.ResEnrollmentDTO;
@@ -14,11 +16,14 @@ import utc.englishlearning.Encybara.repository.EnrollmentRepository;
 import utc.englishlearning.Encybara.repository.CourseRepository;
 import utc.englishlearning.Encybara.repository.UserRepository;
 import utc.englishlearning.Encybara.repository.LessonResultRepository;
+import utc.englishlearning.Encybara.repository.QuestionRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 public class EnrollmentService {
@@ -34,6 +39,9 @@ public class EnrollmentService {
 
     @Autowired
     private LessonResultRepository lessonResultRepository;
+
+    @Autowired
+    private QuestionRepository questionRepository;
 
     @Transactional
     public ResEnrollmentDTO createEnrollment(ReqCreateEnrollmentDTO reqCreateEnrollmentDTO) {
@@ -80,22 +88,36 @@ public class EnrollmentService {
         Enrollment enrollment = enrollmentRepository.findById(reqDto.getEnrollmentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found"));
 
+        // Lấy tất cả các bài học liên quan đến khóa học
+        List<Lesson> lessons = enrollment.getCourse().getLessons(); // Now this works
+
+        // Tính tổng điểm có thể cho tất cả các lesson
+        int totalPointsPossible = lessons.stream()
+                .mapToInt(lesson -> questionRepository.findByLesson(lesson).stream()
+                        .mapToInt(Question::getPoint).sum())
+                .sum();
+
+        // Tính điểm cao nhất cho mỗi lesson
+        Map<Long, Integer> maxPointsByLesson = new HashMap<>();
         List<Lesson_Result> lessonResults = lessonResultRepository.findByEnrollment(enrollment);
+        for (Lesson_Result result : lessonResults) {
+            Long lessonId = result.getLesson().getId();
+            maxPointsByLesson.put(lessonId,
+                    Math.max(maxPointsByLesson.getOrDefault(lessonId, 0), result.getTotalPoints()));
+        }
 
-        int totalPoints = lessonResults.stream()
-                .mapToInt(Lesson_Result::getTotalPoints)
-                .max()
-                .orElse(0); // Lấy điểm cao nhất
+        // Tính tổng điểm cao nhất
+        int totalPoints = maxPointsByLesson.values().stream().mapToInt(Integer::intValue).sum();
 
-        double comLevel = lessonResults.stream()
-                .mapToDouble(Lesson_Result::getComLevel)
-                .average()
-                .orElse(0); // Tính mức độ hoàn thành trung bình
+        // Tính comLevel
+        double comLevel = totalPointsPossible > 0 ? (double) totalPoints / totalPointsPossible * 100 : 0;
 
+        // Cập nhật enrollment
         enrollment.setTotalPoints(totalPoints);
         enrollment.setComLevel(comLevel);
         enrollmentRepository.save(enrollment);
 
+        // Tạo DTO phản hồi
         ResCalculateEnrollmentResultDTO response = new ResCalculateEnrollmentResultDTO();
         response.setEnrollmentId(enrollment.getId());
         response.setTotalPoints(totalPoints);
