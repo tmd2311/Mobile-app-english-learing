@@ -20,13 +20,22 @@ public class Flashcard {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String word;
-    private boolean status;
+    private boolean learnedStatus;
     private Instant addedDate;
     private String example;
     private String definitions;
+    private String vietNameseMeaning;
     private Instant lastReviewed;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "flashcard_group_id")
+    private FlashcardGroup flashcardGroup;
+
+    public String getVietNameseMeaning() {
+        return vietNameseMeaning;
+    }
+
+    public void setVietNameseMeaning(String vietNameseMeaning) {
+        this.vietNameseMeaning = vietNameseMeaning;
+    }
 }

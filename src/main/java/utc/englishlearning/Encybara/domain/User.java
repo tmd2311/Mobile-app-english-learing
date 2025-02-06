@@ -39,10 +39,6 @@ public class User {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
-    List<Flashcard> flashcards;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @JsonIgnore
     private List<Message> messages;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)

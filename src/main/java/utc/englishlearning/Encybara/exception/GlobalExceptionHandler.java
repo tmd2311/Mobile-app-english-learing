@@ -52,13 +52,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
-    @ExceptionHandler({ IdInvalidException.class, StorageException.class })
-    public ResponseEntity<RestResponse<Object>> handleCustomExceptions(Exception ex) {
-        RestResponse<Object> res = new RestResponse<>();
-        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError(ex.getMessage());
-        res.setMessage("Custom exception occurred");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    @ExceptionHandler(IdInvalidException.class)
+    public ResponseEntity<String> handleIdInvalidException(IdInvalidException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleCustomExceptions(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
     }
 
     @ExceptionHandler(ResourceAlreadyExistsException.class)
@@ -75,13 +76,5 @@ public class GlobalExceptionHandler {
         response.setStatusCode(HttpStatus.BAD_REQUEST.value());
         response.setMessage(ex.getMessage());
         return ResponseEntity.badRequest().body(response);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<RestResponse<String>> handleException(Exception e) {
-        RestResponse<String> response = new RestResponse<>();
-        response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        response.setMessage(e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }

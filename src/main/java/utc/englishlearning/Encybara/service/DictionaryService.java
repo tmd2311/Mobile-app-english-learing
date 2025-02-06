@@ -9,7 +9,6 @@ import utc.englishlearning.Encybara.domain.response.dictionary.ResWord;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,24 +18,27 @@ public class DictionaryService {
     public DictionaryService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl("https://api.dictionaryapi.dev/api/v2/entries/en").build();
     }
+
     public Mono<List<ResWord>> getWordDefinition(String word) {
         return webClient.get()
                 .uri("/{word}", word)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<ResWord>>() {})
+                .bodyToMono(new ParameterizedTypeReference<List<ResWord>>() {
+                })
                 .doOnSuccess(res -> {
                     res.forEach(r -> {
                         // Lọc và chỉ lấy phonetic có audio không rỗng
                         List<Phonetic> validPhonetics = r.getPhonetics().stream()
-                                .filter(p -> p.getAudio() != null && !p.getAudio().isEmpty() && p.getText() != null && !p.getText().isEmpty())
+                                .filter(p -> p.getAudio() != null && !p.getAudio().isEmpty() && p.getText() != null
+                                        && !p.getText().isEmpty())
                                 .collect(Collectors.toList());
 
                         // Nếu có phonetic hợp lệ, gán lại phonetics
                         if (!validPhonetics.isEmpty()) {
                             // Bạn có thể chọn phonetic đầu tiên hoặc theo tiêu chí khác
-                            r.setPhonetics(validPhonetics.subList(0, 1));  // Chỉ lấy phonetic đầu tiên có audio
+                            r.setPhonetics(validPhonetics.subList(0, 1)); // Chỉ lấy phonetic đầu tiên có audio
                         } else {
-                            r.setPhonetics(Collections.emptyList());  // Không có phonetic hợp lệ
+                            r.setPhonetics(Collections.emptyList()); // Không có phonetic hợp lệ
                         }
                     });
                 });

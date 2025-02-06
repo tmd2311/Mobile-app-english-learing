@@ -10,7 +10,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,7 +36,6 @@ public class AuthController {
         private final AuthenticationManagerBuilder authenticationManagerBuilder;
         private final SecurityUtil securityUtil;
         private final UserService userService;
-        private final PasswordEncoder passwordEncoder;
         private final OtpService otpService;
         private final EmailService emailService;
 
@@ -47,11 +45,10 @@ public class AuthController {
         public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder,
                         SecurityUtil securityUtil,
                         UserService userService,
-                        PasswordEncoder passwordEncoder, OtpService otpService, EmailService emailService) {
+                        OtpService otpService, EmailService emailService) {
                 this.authenticationManagerBuilder = authenticationManagerBuilder;
                 this.securityUtil = securityUtil;
                 this.userService = userService;
-                this.passwordEncoder = passwordEncoder;
                 this.otpService = otpService;
                 this.emailService = emailService;
         }
@@ -162,7 +159,8 @@ public class AuthController {
                 emailService.sendEmailFromTemplateSync(resCreateUserDto.getEmail(), "Your OTP Code", otp);
 
                 // Lưu thông tin đăng ký
-                String otpID = otpService.saveRegisterData(resCreateUserDto.getEmail(), resCreateUserDto, otp, "register");
+                String otpID = otpService.saveRegisterData(resCreateUserDto.getEmail(), resCreateUserDto, otp,
+                                "register");
                 // Tạo phản hồi
 
                 RestResponse<ResRegisterDTO> response = new RestResponse<>();
@@ -170,9 +168,7 @@ public class AuthController {
                 response.setMessage("OTP sent to your email. Please verify to complete registration.");
                 response.setData(new ResRegisterDTO(otpID, "Expires in 2 minutes"));
 
-
                 return ResponseEntity.ok(response);
         }
-
 
 }
