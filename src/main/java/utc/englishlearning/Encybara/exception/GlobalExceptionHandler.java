@@ -18,12 +18,11 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<RestResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException ex) {
-        RestResponse<Object> res = new RestResponse<>();
-        res.setStatusCode(HttpStatus.NOT_FOUND.value());
-        res.setError("Resource not found");
-        res.setMessage(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+    public ResponseEntity<RestResponse<String>> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        RestResponse<String> response = new RestResponse<>();
+        response.setStatusCode(HttpStatus.NOT_FOUND.value());
+        response.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(value = {
@@ -63,12 +62,26 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceAlreadyExistsException.class)
-    public ResponseEntity<RestResponse<Object>> handleResourceAlreadyExistsException(
-            ResourceAlreadyExistsException ex) {
-        RestResponse<Object> res = new RestResponse<>();
-        res.setStatusCode(HttpStatus.CONFLICT.value());
-        res.setError("Resource already exists");
-        res.setMessage(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(res);
+    public ResponseEntity<RestResponse<String>> handleResourceAlreadyExistsException(ResourceAlreadyExistsException e) {
+        RestResponse<String> response = new RestResponse<>();
+        response.setStatusCode(HttpStatus.CONFLICT.value());
+        response.setMessage(e.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(InvalidOperationException.class)
+    public ResponseEntity<RestResponse<String>> handleInvalidOperationException(InvalidOperationException ex) {
+        RestResponse<String> response = new RestResponse<>();
+        response.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        response.setMessage(ex.getMessage());
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<RestResponse<String>> handleException(Exception e) {
+        RestResponse<String> response = new RestResponse<>();
+        response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.setMessage(e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }

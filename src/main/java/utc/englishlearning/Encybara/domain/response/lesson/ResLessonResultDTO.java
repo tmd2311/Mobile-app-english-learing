@@ -13,5 +13,5 @@ public class ResLessonResultDTO {
     private long stuTime;
     private int point;
     private double comLevel;
-    // Getters và Setters
+    private long enrollmentId;
 }

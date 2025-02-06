@@ -19,17 +19,30 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import utc.englishlearning.Encybara.domain.Learning_Material;
+import utc.englishlearning.Encybara.domain.Lesson;
 import utc.englishlearning.Encybara.exception.StorageException;
 import utc.englishlearning.Encybara.repository.LearningMaterialRepository;
+import utc.englishlearning.Encybara.repository.LessonRepository;
+import utc.englishlearning.Encybara.exception.ResourceNotFoundException;
+import utc.englishlearning.Encybara.domain.Question;
+import utc.englishlearning.Encybara.repository.QuestionRepository;
+
+import java.util.List;
 
 @Service
-public class FileService {
+public class LearningMaterialService {
 
     @Value("${englishlearning.upload-file.base-uri}")
     private String baseURI;
 
     @Autowired
     private LearningMaterialRepository learningMaterialRepository;
+
+    @Autowired
+    private LessonRepository lessonRepository;
+
+    @Autowired
+    private QuestionRepository questionRepository;
 
     public void createDirectory(String folder) throws URISyntaxException {
         URI uri = new URI(folder);
@@ -53,17 +66,28 @@ public class FileService {
         return path.getFileName().toString();
     }
 
-    public String store(MultipartFile file, String folder) throws URISyntaxException, IOException {
-        // create unique filename
-        String finalName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
+    public String store(MultipartFile file, String folder) throws IOException {
+        // Tạo tên file mới
+        String originalFilename = file.getOriginalFilename();
+        String sanitizedFilename = sanitizeFileName(originalFilename);
+        String finalName = System.currentTimeMillis() + "-" + sanitizedFilename;
 
-        URI uri = new URI(baseURI + folder + "/" + finalName);
-        Path path = Paths.get(uri);
+        // Sử dụng Paths.get để tạo đường dẫn mà không có file://
+        Path path = Paths.get(baseURI, folder, finalName);
+        System.out.println("Saving file to: " + path.toString()); // In ra đường dẫn để kiểm tra
+
+        // Kiểm tra và tạo thư mục nếu cần
+        Files.createDirectories(path.getParent());
+
         try (InputStream inputStream = file.getInputStream()) {
-            Files.copy(inputStream, path,
-                    StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
         }
         return finalName;
+    }
+
+    private String sanitizeFileName(String filename) {
+        // Loại bỏ khoảng trắng và ký tự đặc biệt
+        return filename.replaceAll("[^a-zA-Z0-9.\\-]", "_"); // Thay thế ký tự không hợp lệ bằng dấu gạch dưới
     }
 
     public long getFileLength(String fileName, String folder) throws URISyntaxException {
@@ -90,12 +114,19 @@ public class FileService {
     public String getFileNameById(long id) throws StorageException {
         Learning_Material learningMaterial = learningMaterialRepository.findById(id)
                 .orElseThrow(() -> new StorageException("Tệp không tồn tại với ID = " + id));
-        return learningMaterial.getMaterLink(); // Giả sử đây là phương thức để lấy tên tệp
+        return learningMaterial.getMaterLink();
     }
-    public String getFileNameByQuestionId(long id) throws StorageException {
-        Learning_Material learningMaterial = learningMaterialRepository.findByQuestionId(id)
-                .orElseThrow(() -> new StorageException("Tệp không tồn tại với ID = " + id));
-        return learningMaterial.getMaterLink(); // Giả sử đây là phương thức để lấy tên tệp
+
+    public List<Learning_Material> getLearningMaterialsByLessonId(Long lessonId) {
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found with ID: " + lessonId));
+        return learningMaterialRepository.findByLesson(lesson);
+    }
+
+    public List<Learning_Material> getLearningMaterialsByQuestionId(Long questionId) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Question not found with ID: " + questionId));
+        return learningMaterialRepository.findByQuestion(question);
     }
 
 }
