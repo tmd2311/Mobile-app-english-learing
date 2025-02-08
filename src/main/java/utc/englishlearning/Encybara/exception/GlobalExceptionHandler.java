@@ -77,4 +77,12 @@ public class GlobalExceptionHandler {
         response.setMessage(ex.getMessage());
         return ResponseEntity.badRequest().body(response);
     }
+
+    @ExceptionHandler(DictionaryException.class)
+    public ResponseEntity<RestResponse<String>> handleDictionaryException(DictionaryException ex) {
+        RestResponse<String> response = new RestResponse<>();
+        response.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        response.setMessage(ex.getMessage());
+        return ResponseEntity.badRequest().body(response);
+    }
 }

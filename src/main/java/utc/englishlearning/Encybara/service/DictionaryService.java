@@ -6,6 +6,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import utc.englishlearning.Encybara.domain.response.dictionary.Phonetic;
 import utc.englishlearning.Encybara.domain.response.dictionary.ResWord;
+import utc.englishlearning.Encybara.exception.DictionaryException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,7 +43,9 @@ public class DictionaryService {
                             r.setPhonetics(Collections.emptyList()); // Không có phonetic hợp lệ
                         }
                     });
-                });
+                })
+                .onErrorMap(WebClientResponseException.class,
+                        ex -> new DictionaryException("Error retrieving word definition: " + ex.getMessage()));
     }
 
 }
