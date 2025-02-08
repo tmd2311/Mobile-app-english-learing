@@ -42,4 +42,10 @@ public class NotificationService {
     public Page<Notification> getAllNotificationsByUserId(Long userId, Pageable pageable) {
         return notificationRepository.findAllByUserId(userId, pageable);
     }
+
+    public void deleteNotification(Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new NotificationNotFoundException("Notification not found"));
+        notificationRepository.delete(notification);
+    }
 }

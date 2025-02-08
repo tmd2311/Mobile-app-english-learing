@@ -75,4 +75,14 @@ public class NotificationController {
         response.setData(responseDTO);
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{notificationId}")
+    public ResponseEntity<RestResponse<String>> deleteNotification(@PathVariable Long notificationId) {
+        notificationService.deleteNotification(notificationId);
+        RestResponse<String> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Notification deleted successfully");
+        response.setData("Notification with ID " + notificationId + " has been deleted.");
+        return ResponseEntity.ok(response);
+    }
 }
