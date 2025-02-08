@@ -45,6 +45,9 @@ public class FlashcardService {
         flashcard.setLearnedStatus(false);
         flashcard.setAddedDate(Instant.now());
 
+        // Thiết lập lastReviewed bằng addedDate
+        flashcard.setLastReviewed(flashcard.getAddedDate());
+
         // Tìm User từ userId
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         flashcard.setUser(user); // Gán đối tượng User
@@ -121,6 +124,7 @@ public class FlashcardService {
         res.setUserId(flashcard.getUser().getId()); // Lấy userId từ đối tượng User
         res.setAddedDate(flashcard.getAddedDate());
         res.setLearnedStatus(flashcard.isLearnedStatus());
+        res.setLastReviewed(flashcard.getLastReviewed()); // Thêm lastReviewed vào DTO
 
         return res;
     }
@@ -165,18 +169,24 @@ public class FlashcardService {
 
     public ResFlashcardDTO getFlashcard(Long flashcardId) {
         Flashcard flashcard = flashcardRepository.findById(flashcardId)
-                .orElseThrow(() -> new ResourceNotFoundException("Flashcard not found"));
+                .orElseThrow(() -> new RuntimeException("Flashcard not found"));
+
+        // Cập nhật lastReviewed
         flashcard.setLastReviewed(Instant.now());
-        flashcardRepository.save(flashcard);
+        flashcardRepository.save(flashcard); // Lưu lại thay đổi
 
         ResFlashcardDTO res = new ResFlashcardDTO();
         res.setId(flashcard.getId());
         res.setWord(flashcard.getWord());
-        res.setVietNameseMeaning(flashcard.getVietNameseMeaning());
         res.setDefinitions(flashcard.getDefinitions());
+        res.setExamples(flashcard.getExamples());
+        res.setPartOfSpeech(flashcard.getPartOfSpeech());
+        res.setPhonetics(flashcard.getPhonetics());
+        res.setVietNameseMeaning(flashcard.getVietNameseMeaning());
+        res.setUserId(flashcard.getUser().getId());
         res.setAddedDate(flashcard.getAddedDate());
         res.setLearnedStatus(flashcard.isLearnedStatus());
-        res.setLastReviewed(flashcard.getLastReviewed());
+        res.setLastReviewed(flashcard.getLastReviewed()); // Thêm lastReviewed vào DTO
 
         return res;
     }
@@ -187,11 +197,18 @@ public class FlashcardService {
                 pageable);
     }
 
-    public List<Flashcard> getAllFlashcardsSortedByLatest() {
-        return flashcardRepository.findAllByOrderByLastReviewedDesc();
+    public Page<Flashcard> getAllFlashcardsSortedByLatest(Pageable pageable) {
+        return flashcardRepository.findAllByOrderByLastReviewedDesc(pageable);
     }
 
-    public List<Flashcard> getAllFlashcardsSortedByOldest() {
-        return flashcardRepository.findAllByOrderByLastReviewedAsc();
+    public Page<Flashcard> getAllFlashcardsSortedByOldest(Pageable pageable) {
+        return flashcardRepository.findAllByOrderByLastReviewedAsc(pageable);
+    }
+
+    public void markFlashcardAsUnlearned(Long flashcardId) {
+        Flashcard flashcard = flashcardRepository.findById(flashcardId)
+                .orElseThrow(() -> new RuntimeException("Flashcard not found"));
+        flashcard.setLearnedStatus(false); // Đánh dấu là chưa học
+        flashcardRepository.save(flashcard);
     }
 }

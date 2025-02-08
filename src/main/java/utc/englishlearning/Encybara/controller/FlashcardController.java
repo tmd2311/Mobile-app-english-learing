@@ -11,8 +11,6 @@ import utc.englishlearning.Encybara.service.FlashcardService;
 import utc.englishlearning.Encybara.domain.response.RestResponse;
 import utc.englishlearning.Encybara.domain.request.flashcard.ReqFlashcardDTO;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/flashcards")
 public class FlashcardController {
@@ -73,6 +71,15 @@ public class FlashcardController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/{flashcardId}/unlearned")
+    public ResponseEntity<RestResponse<Void>> markFlashcardAsUnlearned(@PathVariable Long flashcardId) {
+        flashcardService.markFlashcardAsUnlearned(flashcardId);
+        RestResponse<Void> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Flashcard marked as unlearned successfully");
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/group/{groupId}")
     public ResponseEntity<RestResponse<Void>> deleteFlashcardGroup(@PathVariable Long groupId) {
         flashcardService.deleteFlashcardGroup(groupId);
@@ -119,22 +126,50 @@ public class FlashcardController {
     }
 
     @GetMapping("/sorted/latest")
-    public ResponseEntity<RestResponse<List<Flashcard>>> getAllFlashcardsSortedByLatest() {
-        List<Flashcard> flashcards = flashcardService.getAllFlashcardsSortedByLatest();
-        RestResponse<List<Flashcard>> response = new RestResponse<>();
+    public ResponseEntity<RestResponse<Page<ResFlashcardDTO>>> getAllFlashcardsSortedByLatest(Pageable pageable) {
+        Page<Flashcard> flashcards = flashcardService.getAllFlashcardsSortedByLatest(pageable);
+        RestResponse<Page<ResFlashcardDTO>> response = new RestResponse<>();
         response.setStatusCode(200);
-        response.setMessage("Flashcards sorted by latest retrieved successfully");
-        response.setData(flashcards);
+        response.setMessage("Flashcards sorted by last reviewed retrieved successfully");
+        response.setData(flashcards.map(flashcard -> {
+            ResFlashcardDTO res = new ResFlashcardDTO();
+            res.setId(flashcard.getId());
+            res.setWord(flashcard.getWord());
+            res.setDefinitions(flashcard.getDefinitions());
+            res.setExamples(flashcard.getExamples());
+            res.setPartOfSpeech(flashcard.getPartOfSpeech());
+            res.setPhonetics(flashcard.getPhonetics());
+            res.setVietNameseMeaning(flashcard.getVietNameseMeaning());
+            res.setUserId(flashcard.getUser().getId());
+            res.setAddedDate(flashcard.getAddedDate());
+            res.setLearnedStatus(flashcard.isLearnedStatus());
+            res.setLastReviewed(flashcard.getLastReviewed());
+            return res;
+        }));
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/sorted/oldest")
-    public ResponseEntity<RestResponse<List<Flashcard>>> getAllFlashcardsSortedByOldest() {
-        List<Flashcard> flashcards = flashcardService.getAllFlashcardsSortedByOldest();
-        RestResponse<List<Flashcard>> response = new RestResponse<>();
+    public ResponseEntity<RestResponse<Page<ResFlashcardDTO>>> getAllFlashcardsSortedByOldest(Pageable pageable) {
+        Page<Flashcard> flashcards = flashcardService.getAllFlashcardsSortedByOldest(pageable);
+        RestResponse<Page<ResFlashcardDTO>> response = new RestResponse<>();
         response.setStatusCode(200);
-        response.setMessage("Flashcards sorted by oldest retrieved successfully");
-        response.setData(flashcards);
+        response.setMessage("Flashcards sorted by last reviewed retrieved successfully");
+        response.setData(flashcards.map(flashcard -> {
+            ResFlashcardDTO res = new ResFlashcardDTO();
+            res.setId(flashcard.getId());
+            res.setWord(flashcard.getWord());
+            res.setDefinitions(flashcard.getDefinitions());
+            res.setExamples(flashcard.getExamples());
+            res.setPartOfSpeech(flashcard.getPartOfSpeech());
+            res.setPhonetics(flashcard.getPhonetics());
+            res.setVietNameseMeaning(flashcard.getVietNameseMeaning());
+            res.setUserId(flashcard.getUser().getId());
+            res.setAddedDate(flashcard.getAddedDate());
+            res.setLearnedStatus(flashcard.isLearnedStatus());
+            res.setLastReviewed(flashcard.getLastReviewed());
+            return res;
+        }));
         return ResponseEntity.ok(response);
     }
 }
