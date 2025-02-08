@@ -2,6 +2,8 @@ package utc.englishlearning.Encybara.domain;
 
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -38,10 +40,12 @@ public class Flashcard {
     private String phoneticAudio;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "flashcard_group_id")
     private FlashcardGroup flashcardGroup;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id")
     private User user;
 

@@ -103,11 +103,10 @@ public class FlashcardService {
         flashcard.setPhoneticText(selectedPhoneticsText.toString());
         flashcard.setPhoneticAudio(selectedPhoneticsAudio.toString());
 
-        // Kiểm tra và tạo nhóm "All Flashcards" nếu chưa tồn tại
-        FlashcardGroup allFlashcardsGroup = flashcardGroupRepository.findByName("All Flashcards");
+        FlashcardGroup allFlashcardsGroup = flashcardGroupRepository.findByName("New Flashcards");
         if (allFlashcardsGroup == null) {
             allFlashcardsGroup = new FlashcardGroup();
-            allFlashcardsGroup.setName("All Flashcards");
+            allFlashcardsGroup.setName("New Flashcards");
             allFlashcardsGroup.setUser(user); // Gán đối tượng User cho nhóm
             flashcardGroupRepository.save(allFlashcardsGroup);
         }
@@ -133,6 +132,9 @@ public class FlashcardService {
     }
 
     public void deleteFlashcard(Long flashcardId) {
+        if (!flashcardRepository.existsById(flashcardId)) {
+            throw new ResourceNotFoundException("Flashcard not found");
+        }
         flashcardRepository.deleteById(flashcardId);
     }
 
@@ -145,7 +147,7 @@ public class FlashcardService {
 
     public ResFlashcardDTO getFlashcard(Long flashcardId) {
         Flashcard flashcard = flashcardRepository.findById(flashcardId)
-                .orElseThrow(() -> new RuntimeException("Flashcard not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Flashcard not found"));
 
         // Cập nhật lastReviewed
         flashcard.setLastReviewed(Instant.now());
@@ -178,7 +180,7 @@ public class FlashcardService {
 
     public void markFlashcardAsUnlearned(Long flashcardId) {
         Flashcard flashcard = flashcardRepository.findById(flashcardId)
-                .orElseThrow(() -> new RuntimeException("Flashcard not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Flashcard not found"));
         flashcard.setLearnedStatus(false); // Đánh dấu là chưa học
         flashcardRepository.save(flashcard);
     }

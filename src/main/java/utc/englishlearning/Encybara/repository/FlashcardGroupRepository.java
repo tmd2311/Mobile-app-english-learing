@@ -5,4 +5,6 @@ import utc.englishlearning.Encybara.domain.FlashcardGroup;
 
 public interface FlashcardGroupRepository extends JpaRepository<FlashcardGroup, Long> {
     FlashcardGroup findByName(String name);
+
+    boolean existsByName(String name);
 }

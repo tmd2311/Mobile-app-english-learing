@@ -11,6 +11,8 @@ import utc.englishlearning.Encybara.exception.ResourceNotFoundException;
 import utc.englishlearning.Encybara.repository.FlashcardGroupRepository;
 import utc.englishlearning.Encybara.repository.FlashcardRepository;
 import utc.englishlearning.Encybara.repository.UserRepository;
+import utc.englishlearning.Encybara.exception.ResourceAlreadyExistsException;
+import utc.englishlearning.Encybara.exception.InvalidOperationException;
 
 @Service
 public class FlashcardGroupService {
@@ -25,12 +27,15 @@ public class FlashcardGroupService {
     private UserRepository userRepository;
 
     public FlashcardGroup createFlashcardGroup(String name, Long userId) {
+        if (flashcardGroupRepository.existsByName(name)) {
+            throw new ResourceAlreadyExistsException("Group with this name already exists");
+        }
+
         FlashcardGroup group = new FlashcardGroup();
         group.setName(name);
 
-        // Tìm User từ userId
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        group.setUser(user); // Gán đối tượng User cho nhóm
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        group.setUser(user);
 
         return flashcardGroupRepository.save(group);
     }
@@ -38,8 +43,19 @@ public class FlashcardGroupService {
     public void addFlashcardToGroup(Long flashcardId, Long groupId) {
         Flashcard flashcard = flashcardRepository.findById(flashcardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Flashcard not found"));
+
         FlashcardGroup group = flashcardGroupRepository.findById(groupId)
-                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Flashcard group not found"));
+
+        if (group.getName().equals("New Flashcards")) {
+            throw new InvalidOperationException("Cannot add flashcard to the 'New Flashcards' group");
+        }
+
+        if (flashcard.getFlashcardGroup() != null
+                && flashcard.getFlashcardGroup().getId() == groupId) {
+            throw new InvalidOperationException("Flashcard is already in this group");
+        }
+
         flashcard.setFlashcardGroup(group);
         flashcardRepository.save(flashcard);
     }
@@ -48,34 +64,50 @@ public class FlashcardGroupService {
         Flashcard flashcard = flashcardRepository.findById(flashcardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Flashcard not found"));
 
-        // Tìm nhóm "All Flashcards"
-        FlashcardGroup allFlashcardsGroup = flashcardGroupRepository.findByName("All Flashcards");
-        if (allFlashcardsGroup == null) {
-            // Nếu nhóm không tồn tại, có thể tạo mới hoặc xử lý theo cách khác
-            allFlashcardsGroup = new FlashcardGroup();
-            allFlashcardsGroup.setName("All Flashcards");
-            allFlashcardsGroup = flashcardGroupRepository.save(allFlashcardsGroup);
+        if (flashcard.getFlashcardGroup() != null && flashcard.getFlashcardGroup().getName().equals("New Flashcards")) {
+            throw new InvalidOperationException("Cannot remove flashcard from the 'New Flashcards' group");
         }
 
-        // Thiết lập nhóm flashcard về nhóm "All Flashcards"
-        flashcard.setFlashcardGroup(allFlashcardsGroup);
+        FlashcardGroup newFlashcardsGroup = flashcardGroupRepository.findByName("New Flashcards");
+        if (newFlashcardsGroup == null) {
+            newFlashcardsGroup = new FlashcardGroup();
+            newFlashcardsGroup.setName("New Flashcards");
+            newFlashcardsGroup = flashcardGroupRepository.save(newFlashcardsGroup);
+        }
+
+        flashcard.setFlashcardGroup(newFlashcardsGroup);
         flashcardRepository.save(flashcard);
     }
 
     public void deleteFlashcardGroup(Long groupId) {
-        flashcardGroupRepository.deleteById(groupId);
+        FlashcardGroup group = flashcardGroupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Flashcard group not found"));
+
+        if (group.getName().equals("New Flashcards")) {
+            throw new InvalidOperationException("Cannot delete the 'New Flashcards' group");
+        }
+
+        flashcardGroupRepository.delete(group);
     }
 
-    public void updateFlashcardGroup(Long groupId, String newName) {
+    public FlashcardGroup updateFlashcardGroup(Long groupId, String newName) {
         FlashcardGroup group = flashcardGroupRepository.findById(groupId)
-                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Flashcard group not found"));
+
+        if (flashcardGroupRepository.existsByName(newName)) {
+            throw new RuntimeException("Group with this name already exists");
+        }
+
         group.setName(newName);
-        flashcardGroupRepository.save(group);
+        return flashcardGroupRepository.save(group);
     }
 
     public Page<Flashcard> getFlashcardsInGroup(Long groupId, Pageable pageable, String word, Boolean learnedStatus,
             String vietnameseMeaning) {
-        return flashcardRepository.findAllByGroupIdAndFilters(groupId, word, learnedStatus, vietnameseMeaning,
+        FlashcardGroup group = flashcardGroupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Flashcard group not found"));
+
+        return flashcardRepository.findAllByFlashcardGroupAndFilters(group, word, learnedStatus, vietnameseMeaning,
                 pageable);
     }
 
