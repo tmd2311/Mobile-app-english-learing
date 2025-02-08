@@ -132,22 +132,6 @@ public class FlashcardService {
         return res;
     }
 
-    public void addFlashcardToGroup(Long flashcardId, Long groupId) {
-        Flashcard flashcard = flashcardRepository.findById(flashcardId)
-                .orElseThrow(() -> new ResourceNotFoundException("Flashcard not found"));
-        FlashcardGroup group = flashcardGroupRepository.findById(groupId)
-                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
-        flashcard.setFlashcardGroup(group);
-        flashcardRepository.save(flashcard);
-    }
-
-    public void removeFlashcardFromGroup(Long flashcardId) {
-        Flashcard flashcard = flashcardRepository.findById(flashcardId)
-                .orElseThrow(() -> new ResourceNotFoundException("Flashcard not found"));
-        flashcard.setFlashcardGroup(null);
-        flashcardRepository.save(flashcard);
-    }
-
     public void deleteFlashcard(Long flashcardId) {
         flashcardRepository.deleteById(flashcardId);
     }
@@ -157,17 +141,6 @@ public class FlashcardService {
                 .orElseThrow(() -> new ResourceNotFoundException("Flashcard not found"));
         flashcard.setLearnedStatus(true);
         flashcardRepository.save(flashcard);
-    }
-
-    public void deleteFlashcardGroup(Long groupId) {
-        flashcardGroupRepository.deleteById(groupId);
-    }
-
-    public void updateFlashcardGroup(Long groupId, String newName) {
-        FlashcardGroup group = flashcardGroupRepository.findById(groupId)
-                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
-        group.setName(newName);
-        flashcardGroupRepository.save(group);
     }
 
     public ResFlashcardDTO getFlashcard(Long flashcardId) {
@@ -193,12 +166,6 @@ public class FlashcardService {
         res.setLastReviewed(flashcard.getLastReviewed()); // Thêm lastReviewed vào DTO
 
         return res;
-    }
-
-    public Page<Flashcard> getFlashcardsInGroup(Long groupId, Pageable pageable, String word, Boolean learnedStatus,
-            String vietnameseMeaning) {
-        return flashcardRepository.findAllByGroupIdAndFilters(groupId, word, learnedStatus, vietnameseMeaning,
-                pageable);
     }
 
     public Page<Flashcard> getAllFlashcardsSortedByLatest(Pageable pageable) {
