@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.util.Base64;
 
+import utc.englishlearning.Encybara.domain.response.auth.ResLoginAdminDTO;
 import utc.englishlearning.Encybara.domain.response.auth.ResLoginDTO;
 
 @Service
@@ -46,11 +47,11 @@ public class SecurityUtil {
     @Value("${englishlearning.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
-    public String createAccessToken(String email, ResLoginDTO dto) {
+    public String createAccessToken(String email, ResLoginDTO res) {
         ResLoginDTO.UserInsideToken userToken = new ResLoginDTO.UserInsideToken();
-        userToken.setId(dto.getUser().getId());
-        userToken.setEmail(dto.getUser().getEmail());
-        userToken.setName(dto.getUser().getName());
+        userToken.setId(res.getUser().getId());
+        userToken.setEmail(res.getUser().getEmail());
+        userToken.setName(res.getUser().getName());
 
         Instant now = Instant.now();
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
@@ -74,15 +75,43 @@ public class SecurityUtil {
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
 
     }
+    public String createAdminAccessToken(String email, ResLoginAdminDTO res) {
+        ResLoginAdminDTO.AdminInsideToken adminToken = new ResLoginAdminDTO.AdminInsideToken();
+        adminToken.setId(res.getAdmin().getId());
+        adminToken.setEmail(res.getAdmin().getEmail());
+        adminToken.setName(res.getAdmin().getName());
 
-    public String createRefreshToken(String email, ResLoginDTO dto) {
+        Instant now = Instant.now();
+        Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
+
+        // hardcode permission (for testing)
+        // List<String> listAuthority = new ArrayList<String>();
+
+        // listAuthority.add("ROLE_USER_CREATE");
+        // listAuthority.add("ROLE_USER_UPDATE");
+
+        // @formatter:off
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+            .issuedAt(now)
+            .expiresAt(validity)
+            .subject(email)
+            .claim("admin", adminToken)
+            // .claim("permission", listAuthority)
+            .build();
+
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+
+    }
+
+    public String createRefreshToken(String email, ResLoginDTO res) {
         Instant now = Instant.now();
         Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
 
         ResLoginDTO.UserInsideToken userToken = new ResLoginDTO.UserInsideToken();
-        userToken.setId(dto.getUser().getId());
-        userToken.setEmail(dto.getUser().getEmail());
-        userToken.setName(dto.getUser().getName());
+        userToken.setId(res.getUser().getId());
+        userToken.setEmail(res.getUser().getEmail());
+        userToken.setName(res.getUser().getName());
 
         // @formatter:off
         JwtClaimsSet claims = JwtClaimsSet.builder()
@@ -90,6 +119,27 @@ public class SecurityUtil {
             .expiresAt(validity)
             .subject(email)
             .claim("user", userToken)
+            .build();
+
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+
+    }
+    public String createAdminRefreshToken(String email, ResLoginAdminDTO res) {
+        Instant now = Instant.now();
+        Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
+
+        ResLoginAdminDTO.AdminInsideToken userToken = new ResLoginAdminDTO.AdminInsideToken();
+        userToken.setId(res.getAdmin().getId());
+        userToken.setEmail(res.getAdmin().getEmail());
+        userToken.setName(res.getAdmin().getName());
+
+        // @formatter:off
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+            .issuedAt(now)
+            .expiresAt(validity)
+            .subject(email)
+            .claim("admin", userToken)
             .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
