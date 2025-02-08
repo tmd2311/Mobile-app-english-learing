@@ -1,11 +1,14 @@
 package utc.englishlearning.Encybara.domain;
 
 import java.time.Instant;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -22,14 +25,24 @@ public class Flashcard {
     private String word;
     private boolean learnedStatus;
     private Instant addedDate;
-    private String example;
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String examples;
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String definitions;
     private String vietNameseMeaning;
     private Instant lastReviewed;
+    private String partOfSpeech;
+    private String phonetics;
 
     @ManyToOne
     @JoinColumn(name = "flashcard_group_id")
     private FlashcardGroup flashcardGroup;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public String getVietNameseMeaning() {
         return vietNameseMeaning;
@@ -37,5 +50,29 @@ public class Flashcard {
 
     public void setVietNameseMeaning(String vietNameseMeaning) {
         this.vietNameseMeaning = vietNameseMeaning;
+    }
+
+    public String getPhonetics() {
+        return phonetics;
+    }
+
+    public void setPhonetics(String phonetics) {
+        this.phonetics = phonetics;
+    }
+
+    public String getPartOfSpeech() {
+        return partOfSpeech;
+    }
+
+    public void setPartOfSpeech(String partOfSpeech) {
+        this.partOfSpeech = partOfSpeech;
+    }
+
+    public String getExamples() {
+        return examples;
+    }
+
+    public void setExamples(String examples) {
+        this.examples = examples;
     }
 }

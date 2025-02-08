@@ -2,7 +2,6 @@ package utc.englishlearning.Encybara.controller.Dictionary;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 import utc.englishlearning.Encybara.domain.response.dictionary.ResWord;
 import utc.englishlearning.Encybara.domain.response.RestResponse;
 import utc.englishlearning.Encybara.service.DictionaryService;
@@ -19,12 +18,8 @@ public class DictionaryController {
     }
 
     @GetMapping("/{word}")
-    public ResponseEntity<RestResponse<List<ResWord>>> getDefinition(@PathVariable String word) {
-        Mono<List<ResWord>> definitionsMono = dictionaryService.getWordDefinition(word);
-
-        // Chuyển đổi Mono<List<ResWord>> thành List<ResWord>
-        List<ResWord> definitions = definitionsMono.block(); // Chặn để lấy giá trị
-
+    public ResponseEntity<RestResponse<List<ResWord>>> getWordDefinitions(@PathVariable String word) {
+        List<ResWord> definitions = dictionaryService.getWordDefinition(word).block();
         RestResponse<List<ResWord>> response = new RestResponse<>();
         response.setStatusCode(200);
         response.setMessage("Definitions retrieved successfully");

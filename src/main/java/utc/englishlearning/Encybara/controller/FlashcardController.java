@@ -9,6 +9,7 @@ import utc.englishlearning.Encybara.domain.Flashcard;
 import utc.englishlearning.Encybara.domain.response.flashcard.ResFlashcardDTO;
 import utc.englishlearning.Encybara.service.FlashcardService;
 import utc.englishlearning.Encybara.domain.response.RestResponse;
+import utc.englishlearning.Encybara.domain.request.flashcard.ReqFlashcardDTO;
 
 import java.util.List;
 
@@ -20,8 +21,14 @@ public class FlashcardController {
     private FlashcardService flashcardService;
 
     @PostMapping
-    public ResponseEntity<RestResponse<ResFlashcardDTO>> createFlashcard(@RequestParam String word) {
-        ResFlashcardDTO flashcard = flashcardService.createFlashcard(word);
+    public ResponseEntity<RestResponse<ResFlashcardDTO>> createFlashcard(
+            @RequestBody ReqFlashcardDTO reqFlashcardDTO) {
+        ResFlashcardDTO flashcard = flashcardService.createFlashcard(
+                reqFlashcardDTO.getWord(),
+                reqFlashcardDTO.getDefinitionIndices(),
+                reqFlashcardDTO.getMeaningIndices(),
+                reqFlashcardDTO.getPhoneticIndices(),
+                reqFlashcardDTO.getUserId());
         RestResponse<ResFlashcardDTO> response = new RestResponse<>();
         response.setStatusCode(200);
         response.setMessage("Flashcard created successfully");
