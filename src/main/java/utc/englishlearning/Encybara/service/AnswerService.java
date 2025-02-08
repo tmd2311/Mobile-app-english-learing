@@ -174,6 +174,29 @@ public class AnswerService {
                 return new PageImpl<>(allAnswers.subList(start, end), pageable, allAnswers.size());
         }
 
+        public ResAnswerDTO getLatestAnswerByUserAndQuestion(Long questionId, Long userId) {
+                User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+                Question question = questionRepository.findById(questionId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
+
+                // Lấy tất cả các câu trả lời của người dùng cho câu hỏi này
+                List<Answer> userAnswers = answerRepository.findByUserAndQuestion(user, question);
+
+                // Lấy câu trả lời mới nhất
+                return userAnswers.stream()
+                                .max((a1, a2) -> Long.compare(a1.getSessionId(), a2.getSessionId()))
+                                .map(answer -> {
+                                        Answer_Text answerText = answerTextRepository.findByAnswer(answer)
+                                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                                        "Answer text not found"));
+                                        return convertToDTO(answer, answerText);
+                                })
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "No answers found for this user and question"));
+        }
+
         private ResAnswerDTO convertToDTO(Answer answer, Answer_Text answerText) {
                 ResAnswerDTO dto = new ResAnswerDTO();
                 dto.setId(answer.getId());

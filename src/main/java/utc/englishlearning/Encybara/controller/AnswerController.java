@@ -80,4 +80,10 @@ public class AnswerController {
         response.setMessage("Answer graded successfully");
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/latest")
+    public ResponseEntity<ResAnswerDTO> getLatestAnswer(@RequestParam Long questionId, @RequestParam Long userId) {
+        ResAnswerDTO latestAnswer = answerService.getLatestAnswerByUserAndQuestion(questionId, userId);
+        return ResponseEntity.ok(latestAnswer);
+    }
 }
