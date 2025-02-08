@@ -138,7 +138,8 @@ public class FlashcardController {
             res.setDefinitions(flashcard.getDefinitions());
             res.setExamples(flashcard.getExamples());
             res.setPartOfSpeech(flashcard.getPartOfSpeech());
-            res.setPhonetics(flashcard.getPhonetics());
+            res.setPhoneticText(flashcard.getPhoneticText());
+            res.setPhoneticAudio(flashcard.getPhoneticAudio());
             res.setVietNameseMeaning(flashcard.getVietNameseMeaning());
             res.setUserId(flashcard.getUser().getId());
             res.setAddedDate(flashcard.getAddedDate());
@@ -162,7 +163,8 @@ public class FlashcardController {
             res.setDefinitions(flashcard.getDefinitions());
             res.setExamples(flashcard.getExamples());
             res.setPartOfSpeech(flashcard.getPartOfSpeech());
-            res.setPhonetics(flashcard.getPhonetics());
+            res.setPhoneticText(flashcard.getPhoneticText());
+            res.setPhoneticAudio(flashcard.getPhoneticAudio());
             res.setVietNameseMeaning(flashcard.getVietNameseMeaning());
             res.setUserId(flashcard.getUser().getId());
             res.setAddedDate(flashcard.getAddedDate());

@@ -34,7 +34,8 @@ public class Flashcard {
     private String vietNameseMeaning;
     private Instant lastReviewed;
     private String partOfSpeech;
-    private String phonetics;
+    private String phoneticText;
+    private String phoneticAudio;
 
     @ManyToOne
     @JoinColumn(name = "flashcard_group_id")
@@ -50,14 +51,6 @@ public class Flashcard {
 
     public void setVietNameseMeaning(String vietNameseMeaning) {
         this.vietNameseMeaning = vietNameseMeaning;
-    }
-
-    public String getPhonetics() {
-        return phonetics;
-    }
-
-    public void setPhonetics(String phonetics) {
-        this.phonetics = phonetics;
     }
 
     public String getPartOfSpeech() {

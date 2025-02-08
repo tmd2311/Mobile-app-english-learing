@@ -44,8 +44,6 @@ public class FlashcardService {
         flashcard.setWord(word);
         flashcard.setLearnedStatus(false);
         flashcard.setAddedDate(Instant.now());
-
-        // Thiết lập lastReviewed bằng addedDate
         flashcard.setLastReviewed(flashcard.getAddedDate());
 
         // Tìm User từ userId
@@ -63,7 +61,6 @@ public class FlashcardService {
         StringBuilder selectedDefinitions = new StringBuilder();
         StringBuilder selectedExamples = new StringBuilder();
         StringBuilder selectedPartOfSpeech = new StringBuilder();
-        StringBuilder selectedPhonetics = new StringBuilder();
 
         for (int index : definitionIndices) {
             if (index < definitions.size()) {
@@ -87,11 +84,15 @@ public class FlashcardService {
         }
 
         // Lưu phonetics đã chọn
+        StringBuilder selectedPhoneticsText = new StringBuilder();
+        StringBuilder selectedPhoneticsAudio = new StringBuilder();
+
         for (int index : phoneticIndices) {
             if (index < definitions.size()) {
                 ResWord definition = definitions.get(index);
                 for (Phonetic phonetic : definition.getPhonetics()) {
-                    selectedPhonetics.append(phonetic.getText()).append(" (").append(phonetic.getAudio()).append("); ");
+                    selectedPhoneticsText.append(phonetic.getText()).append("; ");
+                    selectedPhoneticsAudio.append(phonetic.getAudio()).append("; ");
                 }
             }
         }
@@ -99,7 +100,8 @@ public class FlashcardService {
         flashcard.setDefinitions(selectedDefinitions.toString());
         flashcard.setExamples(selectedExamples.toString());
         flashcard.setPartOfSpeech(selectedPartOfSpeech.toString());
-        flashcard.setPhonetics(selectedPhonetics.toString());
+        flashcard.setPhoneticText(selectedPhoneticsText.toString());
+        flashcard.setPhoneticAudio(selectedPhoneticsAudio.toString());
 
         // Kiểm tra và tạo nhóm "All Flashcards" nếu chưa tồn tại
         FlashcardGroup allFlashcardsGroup = flashcardGroupRepository.findByName("All Flashcards");
@@ -120,11 +122,12 @@ public class FlashcardService {
         res.setDefinitions(flashcard.getDefinitions());
         res.setExamples(flashcard.getExamples());
         res.setPartOfSpeech(flashcard.getPartOfSpeech());
-        res.setPhonetics(flashcard.getPhonetics());
-        res.setUserId(flashcard.getUser().getId()); // Lấy userId từ đối tượng User
+        res.setPhoneticText(flashcard.getPhoneticText());
+        res.setPhoneticAudio(flashcard.getPhoneticAudio());
+        res.setUserId(flashcard.getUser().getId());
         res.setAddedDate(flashcard.getAddedDate());
         res.setLearnedStatus(flashcard.isLearnedStatus());
-        res.setLastReviewed(flashcard.getLastReviewed()); // Thêm lastReviewed vào DTO
+        res.setLastReviewed(flashcard.getLastReviewed());
 
         return res;
     }
@@ -181,7 +184,8 @@ public class FlashcardService {
         res.setDefinitions(flashcard.getDefinitions());
         res.setExamples(flashcard.getExamples());
         res.setPartOfSpeech(flashcard.getPartOfSpeech());
-        res.setPhonetics(flashcard.getPhonetics());
+        res.setPhoneticText(flashcard.getPhoneticText());
+        res.setPhoneticAudio(flashcard.getPhoneticAudio());
         res.setVietNameseMeaning(flashcard.getVietNameseMeaning());
         res.setUserId(flashcard.getUser().getId());
         res.setAddedDate(flashcard.getAddedDate());

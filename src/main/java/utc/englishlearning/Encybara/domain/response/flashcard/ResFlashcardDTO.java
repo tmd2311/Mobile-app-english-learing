@@ -13,7 +13,8 @@ public class ResFlashcardDTO {
     private String definitions;
     private String VietNameseMeaning;
     private String partOfSpeech;
-    private String phonetics;
+    private String phoneticText;
+    private String phoneticAudio;
     private Instant addedDate;
     private boolean learnedStatus;
     private Instant lastReviewed;
@@ -28,12 +29,20 @@ public class ResFlashcardDTO {
         this.lastReviewed = lastReviewed;
     }
 
-    public String getPhonetics() {
-        return phonetics;
+    public String getPhoneticText() {
+        return phoneticText;
     }
 
-    public void setPhonetics(String phonetics) {
-        this.phonetics = phonetics;
+    public void setPhoneticText(String phoneticText) {
+        this.phoneticText = phoneticText;
+    }
+
+    public String getPhoneticAudio() {
+        return phoneticAudio;
+    }
+
+    public void setPhoneticAudio(String phoneticAudio) {
+        this.phoneticAudio = phoneticAudio;
     }
 
     public String getPartOfSpeech() {
