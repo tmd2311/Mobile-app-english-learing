@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import java.time.Instant;
 
 @Entity
 @Table(name = "notifications")
@@ -19,5 +20,13 @@ public class Notification {
     private String message;
     private boolean isRead;
     private Long userId; // ID của người nhận thông báo
-    private String createdAt; // Thời gian tạo thông báo
-} 
+    private Instant createdAt; // Thời gian tạo thông báo
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+}
