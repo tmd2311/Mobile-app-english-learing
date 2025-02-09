@@ -84,6 +84,9 @@ public class AnswerController {
     @GetMapping("/latest")
     public ResponseEntity<ResAnswerDTO> getLatestAnswer(@RequestParam Long questionId, @RequestParam Long userId) {
         ResAnswerDTO latestAnswer = answerService.getLatestAnswerByUserAndQuestion(questionId, userId);
+        RestResponse<Void> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Lastest answer request successfully");
         return ResponseEntity.ok(latestAnswer);
     }
 }
