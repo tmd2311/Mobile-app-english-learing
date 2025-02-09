@@ -1,5 +1,6 @@
 package utc.englishlearning.Encybara.controller.admin;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,12 +30,13 @@ import utc.englishlearning.Encybara.service.AdminService;
 import utc.englishlearning.Encybara.util.SecurityUtil;
 import utc.englishlearning.Encybara.util.annotation.ApiMessage;
 import utc.englishlearning.Encybara.exception.IdInvalidException;
+import org.springframework.security.authentication.AuthenticationManager;
 
 @RestController
 @RequestMapping("/api/v1")
 public class AuthAdminController {
 
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final AuthenticationManager adminAuthManager;
     private final SecurityUtil securityUtil;
     private final AdminService adminService;
     private final PasswordEncoder passwordEncoder;
@@ -42,12 +44,11 @@ public class AuthAdminController {
     @Value("${englishlearning.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
-    public AuthAdminController(
-            AuthenticationManagerBuilder authenticationManagerBuilder,
+    public AuthAdminController(AuthenticationManager adminAuthManager,
             SecurityUtil securityUtil,
             AdminService adminService,
             PasswordEncoder passwordEncoder) {
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.adminAuthManager = adminAuthManager;
         this.securityUtil = securityUtil;
         this.adminService = adminService;
         this.passwordEncoder = passwordEncoder;
@@ -62,8 +63,7 @@ public class AuthAdminController {
 
         try {
             // xác thực người dùng => cần viết hàm loadUserByUsername
-            Authentication authentication = authenticationManagerBuilder.getObject()
-                    .authenticate(authenticationToken);
+            Authentication authentication = adminAuthManager.authenticate(authenticationToken);
 
             // set thông tin người dùng đăng nhập vào context (có thể sử dụng sau này)
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -188,19 +188,28 @@ public class AuthAdminController {
 
     @PostMapping("/admin/logout")
     @ApiMessage("Logout User")
-    public ResponseEntity<Void> logout() throws IdInvalidException {
+    public ResponseEntity<String> logout() throws IdInvalidException {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
 
         if (email.equals("")) {
             throw new IdInvalidException("Access Token không hợp lệ");
         }
 
-        // update refresh token = null
-        this.adminService.updateAdminToken(null, email);
+        // Vô hiệu hóa các token
+        this.adminService.invalidateTokens(email);
 
-        // remove refresh token cookie
-        ResponseCookie deleteSpringCookie = ResponseCookie
-                .from("refresh_token", null)
+        // Xóa cookie refresh_token
+        ResponseCookie deleteRefreshTokenCookie = ResponseCookie
+                .from("refresh_token", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        // Xóa cookie access_token nếu có
+        ResponseCookie deleteAccessTokenCookie = ResponseCookie
+                .from("access_token", "")
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -208,8 +217,9 @@ public class AuthAdminController {
                 .build();
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, deleteSpringCookie.toString())
-                .body(null);
+                .header(HttpHeaders.SET_COOKIE, deleteRefreshTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, deleteAccessTokenCookie.toString())
+                .body("Đăng xuất thành công");
     }
 
     @PostMapping("/admin/register")

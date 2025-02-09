@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import utc.englishlearning.Encybara.domain.Admin;
 import utc.englishlearning.Encybara.domain.Role;
+import utc.englishlearning.Encybara.domain.User;
 import utc.englishlearning.Encybara.domain.response.ResUserDTO;
 import utc.englishlearning.Encybara.domain.response.ResultPaginationDTO;
 import utc.englishlearning.Encybara.domain.response.auth.ResAdminDTO;
@@ -64,6 +65,15 @@ public class AdminService {
             return adminOptional.get();
         }
         return null;
+    }
+
+    public void invalidateTokens(String email) {
+        Admin currentUser = this.handleGetAdminByUsername(email);
+        if (currentUser != null) {
+            // Xóa hoặc vô hiệu hóa token
+            currentUser.setRefreshToken(null);
+            this.adminRepository.save(currentUser);
+        }
     }
 
     public ResultPaginationDTO fetchAllAdmin(Specification<Admin> spec, Pageable pageable) {

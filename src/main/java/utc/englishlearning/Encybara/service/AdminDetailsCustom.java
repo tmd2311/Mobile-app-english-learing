@@ -27,7 +27,7 @@ public class AdminDetailsCustom implements UserDetailsService {
         return new User(
                 admin.getEmail(),
                 admin.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN")));
 
     }
 
