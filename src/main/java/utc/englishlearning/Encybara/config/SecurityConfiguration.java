@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -41,24 +42,31 @@ public class SecurityConfiguration {
 
     @Value("${englishlearning.jwt.base64-secret}")
     private String jwtKey;
+    private final UserDetailsService userDetailsService;
     private final UserDetailsService adminDetailsService;
 
     public SecurityConfiguration(
+            @Qualifier("userDetailsService") UserDetailsService userDetailsService,
             @Qualifier("adminDetailsService") UserDetailsService adminDetailsService) {
+        this.userDetailsService = userDetailsService;
         this.adminDetailsService = adminDetailsService;
     }
 
     @Bean
-    public AuthenticationManager adminAuthManager(
-            @Qualifier("adminDetailsService") UserDetailsService adminDetailsService, PasswordEncoder passwordEncoder)
-            throws Exception {
-        return new ProviderManager(
-                Collections.singletonList(new DaoAuthenticationProvider() {
-                    {
-                        setUserDetailsService(adminDetailsService);
-                        setPasswordEncoder(passwordEncoder);
-                    }
-                }));
+    @Primary
+    public AuthenticationManager authenticationManager(PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return new ProviderManager(Collections.singletonList(authProvider));
+    }
+
+    @Bean
+    public AuthenticationManager adminAuthManager(PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(adminDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return new ProviderManager(Collections.singletonList(authProvider));
     }
 
     @Bean

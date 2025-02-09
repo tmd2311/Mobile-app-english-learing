@@ -44,7 +44,7 @@ public class AuthAdminController {
     @Value("${englishlearning.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
-    public AuthAdminController(AuthenticationManager adminAuthManager,
+    public AuthAdminController(@Qualifier("adminAuthManager") AuthenticationManager adminAuthManager,
             SecurityUtil securityUtil,
             AdminService adminService,
             PasswordEncoder passwordEncoder) {

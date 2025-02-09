@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -33,7 +34,7 @@ import utc.englishlearning.Encybara.util.SecurityUtil;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-        private final AuthenticationManagerBuilder authenticationManagerBuilder;
+        private final AuthenticationManager authenticationManager;
         private final SecurityUtil securityUtil;
         private final UserService userService;
         private final OtpService otpService;
@@ -42,11 +43,11 @@ public class AuthController {
         @Value("${englishlearning.jwt.refresh-token-validity-in-seconds}")
         private long refreshTokenExpiration;
 
-        public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder,
+        public AuthController(AuthenticationManager authenticationManager,
                         SecurityUtil securityUtil,
                         UserService userService,
                         OtpService otpService, EmailService emailService) {
-                this.authenticationManagerBuilder = authenticationManagerBuilder;
+                this.authenticationManager = authenticationManager;
                 this.securityUtil = securityUtil;
                 this.userService = userService;
                 this.otpService = otpService;
@@ -57,9 +58,7 @@ public class AuthController {
         public ResponseEntity<ResLoginDTO> login(@Valid @RequestBody ReqLoginDTO loginDto) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                                 loginDto.getUsername(), loginDto.getPassword());
-
-                Authentication authentication = authenticationManagerBuilder.getObject()
-                                .authenticate(authenticationToken);
+                Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
