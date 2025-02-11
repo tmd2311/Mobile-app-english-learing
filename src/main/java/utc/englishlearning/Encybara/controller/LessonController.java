@@ -63,7 +63,7 @@ public class LessonController {
     }
 
     @PostMapping("/{lessonId}/questions")
-    public ResponseEntity<RestResponse<Void>> addQuestionsToLesson(@PathVariable Long lessonId,
+    public ResponseEntity<RestResponse<Void>> addQuestionsToLesson(@PathVariable("lessonId") Long lessonId,
             @RequestBody ReqAddQuestionsToLessonDTO reqAddQuestionsToLessonDTO) {
         lessonService.addQuestionsToLesson(lessonId, reqAddQuestionsToLessonDTO);
         RestResponse<Void> response = new RestResponse<>();
@@ -73,7 +73,7 @@ public class LessonController {
     }
 
     @DeleteMapping("/{lessonId}/questions")
-    public ResponseEntity<RestResponse<Void>> removeQuestionFromLesson(@PathVariable Long lessonId,
+    public ResponseEntity<RestResponse<Void>> removeQuestionFromLesson(@PathVariable("lessonId") Long lessonId,
             @RequestBody ReqRemoveQuestionFromLessonDTO reqRemoveQuestionFromLessonDTO) {
         lessonService.removeQuestionFromLesson(lessonId, reqRemoveQuestionFromLessonDTO.getQuestionId());
         RestResponse<Void> response = new RestResponse<>();

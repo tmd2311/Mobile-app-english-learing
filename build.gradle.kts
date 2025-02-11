@@ -46,8 +46,6 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 }
-
-
-tasks.withType<Test> {
-	useJUnitPlatform()
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.add("-parameters")
 }
