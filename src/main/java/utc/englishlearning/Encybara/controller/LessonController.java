@@ -32,7 +32,7 @@ public class LessonController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RestResponse<ResLessonDTO>> updateLesson(@PathVariable Long id,
+    public ResponseEntity<RestResponse<ResLessonDTO>> updateLesson(@PathVariable("id") Long id,
             @RequestBody ReqUpdateLessonDTO reqUpdateLessonDTO) {
         ResLessonDTO lessonDTO = lessonService.updateLesson(id, reqUpdateLessonDTO);
         RestResponse<ResLessonDTO> response = new RestResponse<>();
@@ -43,7 +43,7 @@ public class LessonController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RestResponse<ResLessonDTO>> getLessonById(@PathVariable Long id) {
+    public ResponseEntity<RestResponse<ResLessonDTO>> getLessonById(@PathVariable("id") Long id) {
         ResLessonDTO lessonDTO = lessonService.getLessonById(id);
         RestResponse<ResLessonDTO> response = new RestResponse<>();
         response.setStatusCode(HttpStatus.OK.value());
@@ -83,7 +83,7 @@ public class LessonController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<RestResponse<Void>> deleteLesson(@PathVariable Long id) {
+    public ResponseEntity<RestResponse<Void>> deleteLesson(@PathVariable("id") Long id) {
         lessonService.deleteLesson(id);
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(HttpStatus.OK.value());

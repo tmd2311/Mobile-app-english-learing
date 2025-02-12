@@ -32,7 +32,7 @@ public class StudyScheduleController {
 
     @PutMapping("/{id}")
     public ResponseEntity<RestResponse<ResScheduleDTO>> updateSchedule(
-            @PathVariable Long id, @RequestBody ReqCreateScheduleDTO reqCreateScheduleDTO) {
+            @PathVariable("id") Long id, @RequestBody ReqCreateScheduleDTO reqCreateScheduleDTO) {
         ResScheduleDTO scheduleDTO = studyScheduleService.updateSchedule(id, reqCreateScheduleDTO);
         RestResponse<ResScheduleDTO> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -42,7 +42,7 @@ public class StudyScheduleController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<RestResponse<Void>> deleteSchedule(@PathVariable Long id) {
+    public ResponseEntity<RestResponse<Void>> deleteSchedule(@PathVariable("id") Long id) {
         studyScheduleService.deleteSchedule(id);
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -51,7 +51,7 @@ public class StudyScheduleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RestResponse<ResScheduleDTO>> getScheduleById(@PathVariable Long id) {
+    public ResponseEntity<RestResponse<ResScheduleDTO>> getScheduleById(@PathVariable("id") Long id) {
         ResScheduleDTO scheduleDTO = studyScheduleService.getScheduleById(id);
         RestResponse<ResScheduleDTO> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -62,7 +62,7 @@ public class StudyScheduleController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<RestResponse<Page<ResScheduleDTO>>> getAllSchedulesByUserId(
-            @PathVariable Long userId, Pageable pageable) {
+            @PathVariable("userId") Long userId, Pageable pageable) {
         Page<ResScheduleDTO> schedules = studyScheduleService.getAllSchedulesByUserId(userId, pageable);
         RestResponse<Page<ResScheduleDTO>> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -73,7 +73,7 @@ public class StudyScheduleController {
 
     @GetMapping("/course/{courseId}/user/{userId}")
     public ResponseEntity<RestResponse<List<ResScheduleDTO>>> getSchedulesByCourseIdAndUserId(
-            @PathVariable Long courseId, @PathVariable Long userId) {
+            @PathVariable("courseId") Long courseId, @PathVariable("userId") Long userId) {
         List<ResScheduleDTO> schedules = studyScheduleService.getAllSchedulesByCourseIdAndUserId(courseId, userId);
         RestResponse<List<ResScheduleDTO>> response = new RestResponse<>();
         response.setStatusCode(200);

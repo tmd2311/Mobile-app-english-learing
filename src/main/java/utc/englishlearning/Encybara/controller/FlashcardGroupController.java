@@ -39,7 +39,7 @@ public class FlashcardGroupController {
     }
 
     @DeleteMapping("/{groupId}")
-    public ResponseEntity<RestResponse<Void>> deleteFlashcardGroup(@PathVariable Long groupId) {
+    public ResponseEntity<RestResponse<Void>> deleteFlashcardGroup(@PathVariable("groupId") Long groupId) {
         flashcardGroupService.deleteFlashcardGroup(groupId);
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -48,7 +48,7 @@ public class FlashcardGroupController {
     }
 
     @PutMapping("/{groupId}")
-    public ResponseEntity<RestResponse<Void>> updateFlashcardGroup(@PathVariable Long groupId,
+    public ResponseEntity<RestResponse<Void>> updateFlashcardGroup(@PathVariable("groupId") Long groupId,
             @RequestParam String newName) {
         flashcardGroupService.updateFlashcardGroup(groupId, newName);
         RestResponse<Void> response = new RestResponse<>();
@@ -59,7 +59,7 @@ public class FlashcardGroupController {
 
     @GetMapping("/{groupId}")
     public ResponseEntity<RestResponse<Page<Flashcard>>> getFlashcardsInGroup(
-            @PathVariable Long groupId,
+            @PathVariable("groupId") Long groupId,
             Pageable pageable,
             @RequestParam(required = false) String word,
             @RequestParam(required = false) Boolean learnedStatus,
@@ -74,8 +74,8 @@ public class FlashcardGroupController {
     }
 
     @PostMapping("/{flashcardId}/group/{groupId}")
-    public ResponseEntity<RestResponse<Void>> addFlashcardToGroup(@PathVariable Long flashcardId,
-            @PathVariable Long groupId) {
+    public ResponseEntity<RestResponse<Void>> addFlashcardToGroup(@PathVariable("flashcardId") Long flashcardId,
+            @PathVariable("groupId") Long groupId) {
         flashcardGroupService.addFlashcardToGroup(flashcardId, groupId);
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -84,7 +84,7 @@ public class FlashcardGroupController {
     }
 
     @DeleteMapping("/{flashcardId}/group")
-    public ResponseEntity<RestResponse<Void>> removeFlashcardFromGroup(@PathVariable Long flashcardId) {
+    public ResponseEntity<RestResponse<Void>> removeFlashcardFromGroup(@PathVariable("flashcardId") Long flashcardId) {
         flashcardGroupService.removeFlashcardFromGroup(flashcardId);
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(200);

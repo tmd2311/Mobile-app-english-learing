@@ -40,7 +40,7 @@ public class QuestionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<RestResponse<Void>> deleteQuestion(@PathVariable Long id) {
+    public ResponseEntity<RestResponse<Void>> deleteQuestion(@PathVariable("id") Long id) {
         questionService.deleteQuestion(id);
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(200);

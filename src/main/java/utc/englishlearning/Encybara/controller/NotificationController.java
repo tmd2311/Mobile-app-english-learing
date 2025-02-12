@@ -38,7 +38,7 @@ public class NotificationController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<RestResponse<Page<ResNotificationDTO>>> getAllNotificationsByUserId(
-            @PathVariable Long userId,
+            @PathVariable("userId") Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -60,7 +60,8 @@ public class NotificationController {
     }
 
     @PutMapping("/read/{notificationId}")
-    public ResponseEntity<RestResponse<ResNotificationDTO>> markAsRead(@PathVariable Long notificationId) {
+    public ResponseEntity<RestResponse<ResNotificationDTO>> markAsRead(
+            @PathVariable("notificationId") Long notificationId) {
         Notification notification = notificationService.markAsRead(notificationId);
         ResNotificationDTO responseDTO = new ResNotificationDTO();
         responseDTO.setId(notification.getId());
@@ -77,7 +78,8 @@ public class NotificationController {
     }
 
     @DeleteMapping("/{notificationId}")
-    public ResponseEntity<RestResponse<String>> deleteNotification(@PathVariable Long notificationId) {
+    public ResponseEntity<RestResponse<String>> deleteNotification(
+            @PathVariable("notificationId") Long notificationId) {
         notificationService.deleteNotification(notificationId);
         RestResponse<String> response = new RestResponse<>();
         response.setStatusCode(200);

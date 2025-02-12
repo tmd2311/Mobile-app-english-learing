@@ -36,7 +36,7 @@ public class FlashcardController {
     }
 
     @DeleteMapping("/{flashcardId}")
-    public ResponseEntity<RestResponse<Void>> deleteFlashcard(@PathVariable Long flashcardId) {
+    public ResponseEntity<RestResponse<Void>> deleteFlashcard(@PathVariable("flashcardId") Long flashcardId) {
         flashcardService.deleteFlashcard(flashcardId);
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -45,7 +45,7 @@ public class FlashcardController {
     }
 
     @PutMapping("/{flashcardId}/learned")
-    public ResponseEntity<RestResponse<Void>> markFlashcardAsLearned(@PathVariable Long flashcardId) {
+    public ResponseEntity<RestResponse<Void>> markFlashcardAsLearned(@PathVariable("flashcardId") Long flashcardId) {
         try {
             flashcardService.markFlashcardAsLearned(flashcardId);
             RestResponse<Void> response = new RestResponse<>();
@@ -61,7 +61,7 @@ public class FlashcardController {
     }
 
     @PutMapping("/{flashcardId}/unlearned")
-    public ResponseEntity<RestResponse<Void>> markFlashcardAsUnlearned(@PathVariable Long flashcardId) {
+    public ResponseEntity<RestResponse<Void>> markFlashcardAsUnlearned(@PathVariable("flashcardId") Long flashcardId) {
         try {
             flashcardService.markFlashcardAsUnlearned(flashcardId);
             RestResponse<Void> response = new RestResponse<>();
@@ -77,7 +77,7 @@ public class FlashcardController {
     }
 
     @GetMapping("/{flashcardId}")
-    public ResponseEntity<RestResponse<ResFlashcardDTO>> getFlashcard(@PathVariable Long flashcardId) {
+    public ResponseEntity<RestResponse<ResFlashcardDTO>> getFlashcard(@PathVariable("flashcardId") Long flashcardId) {
         ResFlashcardDTO flashcard = flashcardService.getFlashcard(flashcardId);
         RestResponse<ResFlashcardDTO> response = new RestResponse<>();
         response.setStatusCode(200);

@@ -29,7 +29,8 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RestResponse<ResReviewDTO>> updateReview(@PathVariable Long id, @RequestParam Long userId,
+    public ResponseEntity<RestResponse<ResReviewDTO>> updateReview(@PathVariable("id") Long id,
+            @RequestParam Long userId,
             @RequestBody ReqCreateReviewDTO reqUpdateReviewDTO) {
         ResReviewDTO reviewDTO = reviewService.updateReview(id, userId, reqUpdateReviewDTO);
         RestResponse<ResReviewDTO> response = new RestResponse<>();
@@ -40,7 +41,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<RestResponse<Void>> deleteReview(@PathVariable Long id, @RequestParam Long userId) {
+    public ResponseEntity<RestResponse<Void>> deleteReview(@PathVariable("id") Long id, @RequestParam Long userId) {
         reviewService.deleteReview(id, userId);
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -50,7 +51,7 @@ public class ReviewController {
 
     @GetMapping("/course/{courseId}")
     public ResponseEntity<RestResponse<Page<ResReviewDTO>>> getAllReviewsByCourseId(
-            @PathVariable Long courseId,
+            @PathVariable("courseId") Long courseId,
             @RequestParam(required = false) Integer numStar,
             @RequestParam(required = false) ReviewStatusEnum status,
             Pageable pageable) {
@@ -64,7 +65,7 @@ public class ReviewController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<RestResponse<Page<ResReviewDTO>>> getAllReviewsByUserId(
-            @PathVariable Long userId, Pageable pageable) {
+            @PathVariable("courseId") Long userId, Pageable pageable) {
         Page<ResReviewDTO> reviews = reviewService.getAllReviewsByUserId(userId, pageable);
         RestResponse<Page<ResReviewDTO>> response = new RestResponse<>();
         response.setStatusCode(200);

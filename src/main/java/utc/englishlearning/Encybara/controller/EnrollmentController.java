@@ -32,7 +32,7 @@ public class EnrollmentController {
     }
 
     @PutMapping("/{id}/join")
-    public ResponseEntity<RestResponse<Void>> joinCourse(@PathVariable Long id) {
+    public ResponseEntity<RestResponse<Void>> joinCourse(@PathVariable("id") Long id) {
         enrollmentService.joinCourse(id);
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -41,7 +41,7 @@ public class EnrollmentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<RestResponse<Void>> refuseCourse(@PathVariable Long id) {
+    public ResponseEntity<RestResponse<Void>> refuseCourse(@PathVariable("id") Long id) {
         enrollmentService.refuseCourse(id);
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -51,7 +51,7 @@ public class EnrollmentController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<RestResponse<Page<ResEnrollmentDTO>>> getEnrollmentsByUserId(
-            @PathVariable Long userId,
+            @PathVariable("userId") Long userId,
             @RequestParam(required = false) Boolean proStatus,
             Pageable pageable) {
         Page<ResEnrollmentDTO> enrollments = enrollmentService.getEnrollmentsByUserId(userId, proStatus, pageable);

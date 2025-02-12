@@ -29,7 +29,7 @@ public class DiscussionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<RestResponse<Void>> deleteDiscussion(@PathVariable Long id) {
+    public ResponseEntity<RestResponse<Void>> deleteDiscussion(@PathVariable("id") Long id) {
         discussionService.deleteDiscussion(id);
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -38,7 +38,7 @@ public class DiscussionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RestResponse<ResDiscussionDTO>> getDiscussionById(@PathVariable Long id) {
+    public ResponseEntity<RestResponse<ResDiscussionDTO>> getDiscussionById(@PathVariable("id") Long id) {
         ResDiscussionDTO discussionDTO = discussionService.getDiscussionById(id);
         RestResponse<ResDiscussionDTO> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -49,7 +49,7 @@ public class DiscussionController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<RestResponse<Page<ResDiscussionDTO>>> getAllDiscussionsByUserId(
-            @PathVariable Long userId, Pageable pageable) {
+            @PathVariable("userId") Long userId, Pageable pageable) {
         Page<ResDiscussionDTO> discussions = discussionService.getAllDiscussionsByUserId(userId, pageable);
         RestResponse<Page<ResDiscussionDTO>> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -60,7 +60,7 @@ public class DiscussionController {
 
     @GetMapping("/lesson/{lessonId}")
     public ResponseEntity<RestResponse<Page<ResDiscussionDTO>>> getAllDiscussionsByLessonId(
-            @PathVariable Long lessonId, Pageable pageable) {
+            @PathVariable("lessonId") Long lessonId, Pageable pageable) {
         Page<ResDiscussionDTO> discussions = discussionService.getAllDiscussionsByLessonId(lessonId, pageable);
         RestResponse<Page<ResDiscussionDTO>> response = new RestResponse<>();
         response.setStatusCode(200);

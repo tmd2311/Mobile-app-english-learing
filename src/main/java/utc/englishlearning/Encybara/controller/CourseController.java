@@ -32,7 +32,7 @@ public class CourseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RestResponse<ResCourseDTO>> updateCourse(@PathVariable Long id,
+    public ResponseEntity<RestResponse<ResCourseDTO>> updateCourse(@PathVariable("id") Long id,
             @RequestBody ReqUpdateCourseDTO reqUpdateCourseDTO) {
         ResCourseDTO courseDTO = courseService.updateCourse(id, reqUpdateCourseDTO);
         RestResponse<ResCourseDTO> response = new RestResponse<>();
@@ -43,7 +43,7 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RestResponse<ResCourseDTO>> getCourseById(@PathVariable Long id) {
+    public ResponseEntity<RestResponse<ResCourseDTO>> getCourseById(@PathVariable("id") Long id) {
         ResCourseDTO courseDTO = courseService.getCourseById(id);
         RestResponse<ResCourseDTO> response = new RestResponse<>();
         response.setStatusCode(200);
@@ -83,7 +83,7 @@ public class CourseController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<RestResponse<Void>> deleteCourse(@PathVariable Long id) {
+    public ResponseEntity<RestResponse<Void>> deleteCourse(@PathVariable("id") Long id) {
         courseService.deleteCourse(id);
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(HttpStatus.OK.value());
