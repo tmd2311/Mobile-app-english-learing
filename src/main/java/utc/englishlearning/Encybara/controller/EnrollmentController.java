@@ -52,7 +52,7 @@ public class EnrollmentController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<RestResponse<Page<ResEnrollmentDTO>>> getEnrollmentsByUserId(
             @PathVariable("userId") Long userId,
-            @RequestParam(required = false) Boolean proStatus,
+            @RequestParam("proStatus") Boolean proStatus,
             Pageable pageable) {
         Page<ResEnrollmentDTO> enrollments = enrollmentService.getEnrollmentsByUserId(userId, proStatus, pageable);
         RestResponse<Page<ResEnrollmentDTO>> response = new RestResponse<>();
