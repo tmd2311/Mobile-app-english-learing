@@ -18,16 +18,12 @@ import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import utc.englishlearning.Encybara.domain.Admin;
-import utc.englishlearning.Encybara.domain.response.ResUpdateUserDTO;
-import utc.englishlearning.Encybara.domain.response.ResUserDTO;
 import utc.englishlearning.Encybara.domain.response.ResultPaginationDTO;
 import utc.englishlearning.Encybara.domain.response.auth.ResAdminDTO;
 import utc.englishlearning.Encybara.domain.response.auth.ResCreateAdmin;
-import utc.englishlearning.Encybara.domain.response.auth.ResCreateUserDTO;
 import utc.englishlearning.Encybara.domain.response.auth.ResUpdateAdmin;
 import utc.englishlearning.Encybara.exception.IdInvalidException;
 import utc.englishlearning.Encybara.service.AdminService;
-import utc.englishlearning.Encybara.service.UserService;
 import utc.englishlearning.Encybara.util.annotation.ApiMessage;
 
 @RestController

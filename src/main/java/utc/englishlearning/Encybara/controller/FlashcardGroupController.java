@@ -12,6 +12,7 @@ import utc.englishlearning.Encybara.domain.request.FlashcardGroupRequest;
 import utc.englishlearning.Encybara.domain.response.FlashcardGroupResponse;
 import utc.englishlearning.Encybara.service.FlashcardGroupService;
 import utc.englishlearning.Encybara.domain.response.RestResponse;
+import org.springframework.data.domain.PageRequest;
 
 @RestController
 @RequestMapping("/api/v1/flashcard-groups")
@@ -89,6 +90,21 @@ public class FlashcardGroupController {
         RestResponse<Void> response = new RestResponse<>();
         response.setStatusCode(200);
         response.setMessage("Flashcard removed from group successfully");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<RestResponse<Page<FlashcardGroup>>> getAllFlashcardGroupsByUserId(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<FlashcardGroup> flashcardGroups = flashcardGroupService.getAllFlashcardGroupsByUserId(userId, pageable);
+
+        RestResponse<Page<FlashcardGroup>> response = new RestResponse<>();
+        response.setStatusCode(200);
+        response.setMessage("Flashcard groups retrieved successfully");
+        response.setData(flashcardGroups);
         return ResponseEntity.ok(response);
     }
 }

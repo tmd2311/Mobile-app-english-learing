@@ -111,4 +111,8 @@ public class FlashcardGroupService {
                 pageable);
     }
 
+    public Page<FlashcardGroup> getAllFlashcardGroupsByUserId(Long userId, Pageable pageable) {
+        return flashcardGroupRepository.findAllByUserId(userId, pageable);
+    }
+
 }

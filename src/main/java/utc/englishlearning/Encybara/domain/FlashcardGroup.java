@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "flashcard_groups")
@@ -17,9 +18,11 @@ public class FlashcardGroup {
     private String name;
 
     @OneToMany(mappedBy = "flashcardGroup", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Flashcard> flashcards;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id")
     private User user;
 }

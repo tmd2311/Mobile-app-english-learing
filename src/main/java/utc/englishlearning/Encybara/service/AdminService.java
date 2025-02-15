@@ -11,15 +11,11 @@ import org.springframework.stereotype.Service;
 
 import utc.englishlearning.Encybara.domain.Admin;
 import utc.englishlearning.Encybara.domain.Role;
-import utc.englishlearning.Encybara.domain.User;
-import utc.englishlearning.Encybara.domain.response.ResUserDTO;
 import utc.englishlearning.Encybara.domain.response.ResultPaginationDTO;
 import utc.englishlearning.Encybara.domain.response.auth.ResAdminDTO;
 import utc.englishlearning.Encybara.domain.response.auth.ResCreateAdmin;
-import utc.englishlearning.Encybara.domain.response.auth.ResCreateUserDTO;
 import utc.englishlearning.Encybara.domain.response.auth.ResUpdateAdmin;
 import utc.englishlearning.Encybara.repository.AdminRepository;
-import utc.englishlearning.Encybara.repository.RoleRepository;
 
 @Service
 public class AdminService {

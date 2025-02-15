@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,10 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import utc.englishlearning.Encybara.domain.Admin;
-import utc.englishlearning.Encybara.domain.User;
 import utc.englishlearning.Encybara.domain.request.auth.ReqLoginDTO;
 import utc.englishlearning.Encybara.domain.response.auth.ResCreateAdmin;
-import utc.englishlearning.Encybara.domain.response.auth.ResCreateUserDTO;
 import utc.englishlearning.Encybara.domain.response.auth.ResLoginAdminDTO;
 import utc.englishlearning.Encybara.service.AdminService;
 import utc.englishlearning.Encybara.util.SecurityUtil;
