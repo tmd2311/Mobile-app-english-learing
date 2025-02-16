@@ -101,6 +101,7 @@ public class SecurityConfiguration {
                 "/api/v1/permissions/**",
                 "/api/v1/admin/**",
                 "/api/v1/flashcard-groups/**",
+                "/api/v1/flashcards/**",
         };
 
         http
