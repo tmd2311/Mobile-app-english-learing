@@ -70,7 +70,7 @@ public class UserService {
         if (currentUser != null) {
             currentUser.setName(reqUser.getName());
             currentUser.setPhone(reqUser.getPhone());
-            currentUser.setField(reqUser.getField());
+            currentUser.setSpeciField(reqUser.getSpeciField());
             currentUser.setAvatar(reqUser.getAvatar());
             currentUser.setEnglishlevel(reqUser.getEnglishlevel());
             currentUser = this.userRepository.save(currentUser);
@@ -94,7 +94,7 @@ public class UserService {
         res.setName(user.getName());
         res.setPassword(user.getPassword());
         res.setPhone(user.getPhone());
-        res.setField(user.getField());
+        res.setSpeciField(user.getSpeciField());
         res.setAvatar(user.getAvatar());
         res.setEnglishlevel(user.getEnglishlevel());
 
@@ -107,7 +107,7 @@ public class UserService {
         res.setId(user.getId());
         res.setName(user.getName());
         res.setPhone(user.getPhone());
-        res.setField(user.getField());
+        res.setSpeciField(user.getSpeciField());
         res.setAvatar(user.getAvatar());
         res.setEnglishlevel(user.getEnglishlevel());
 
@@ -121,7 +121,7 @@ public class UserService {
         res.setEmail(user.getEmail());
         res.setName(user.getName());
         res.setPhone(user.getPhone());
-        res.setField(user.getField());
+        res.setSpeciField(user.getSpeciField());
         res.setAvatar(user.getAvatar());
         res.setEnglishlevel(user.getEnglishlevel());
 

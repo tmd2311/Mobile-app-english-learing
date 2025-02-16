@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import utc.englishlearning.Encybara.util.constant.SpecialFieldEnum;
 
 @Getter
 @Setter
@@ -15,7 +16,7 @@ public class ResUserDTO {
     private String name;
 
     private String phone;
-    private int field;
+    private SpecialFieldEnum speciField;
     private String avatar;
     private String englishlevel;
 }

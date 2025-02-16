@@ -2,6 +2,7 @@ package utc.englishlearning.Encybara.domain.response;
 
 import lombok.Getter;
 import lombok.Setter;
+import utc.englishlearning.Encybara.util.constant.SpecialFieldEnum;
 
 @Getter
 @Setter
@@ -11,7 +12,7 @@ public class ResUpdateUserDTO {
     private String address;
 
     private String phone;
-    private int field;
+    private SpecialFieldEnum speciField;
     private String avatar;
     private String englishlevel;
 }
